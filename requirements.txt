@@ -9,3 +9,4 @@ langchain-experimental
 llama-cpp-python
 pandas
 tabulate
+numexpr
