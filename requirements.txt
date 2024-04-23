@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+httpx
+
+starlette
+
+langchain-community
+langchain-experimental
+llama-cpp-python
+pandas
+tabulate
