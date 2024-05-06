@@ -1,0 +1,13 @@
+
+#grid {
+    height: 400px;
+}
+
+#toolbar {
+    background: var(--tableodd);
+    margin-bottom: 12px;
+    padding: 8px;
+    display: flex;
+    justify-content: space-between;
+}
+
