@@ -35,20 +35,32 @@ h2{
     display: none
 } 
   
-#form .previous-step, .next-step { 
+.next-step { 
     width: 100px; 
     font-weight: bold; 
     color: white; 
     border: 0 none; 
-    border-radius: 0px; 
+    border-radius: 5px; 
     cursor: pointer; 
     padding: 10px 5px; 
-    margin: 10px 5px 10px 0px; 
+    margin: 30px 5px 10px 0px; 
     float: right
+}
+
+.previous-step { 
+    width: 120px; 
+    font-weight: bold; 
+    color: white; 
+    border: 0 none; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    padding: 10px 5px; 
+    margin: 30px 5px 10px 0px; 
+    float: left
 } 
   
 .form, .previous-step { 
-    background: #616161; 
+    background: #2F8D46; 
 } 
   
 .form, .next-step { 
@@ -57,17 +69,17 @@ h2{
   
 #form .previous-step:hover, 
 #form .previous-step:focus { 
-    background-color: #000000
+    background-color: #2F8D46;
 } 
   
 #form .next-step:hover, 
 #form .next-step:focus { 
-    background-color: #2F8D46
+    background-color: #2F8D46;
 } 
   
 .text { 
     color: #2F8D46; 
-    font-weight: normal
+    font-weight: normal;
 } 
   
 #progressbar { 

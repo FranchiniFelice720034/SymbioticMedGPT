@@ -7,15 +7,13 @@
     <link rel="stylesheet" href="static/css/csv_page.css"> 
 </head>
     <div class="container">
-        <form action="/" method="GET">
             <!-- progressbar -->
             <div class="row">
                 <div class="container"> 
                     <div class="row justify-content-center"> 
-                        <div class="col-11 col-sm-9 col-md-7  
-                            col-lg-6 col-xl-5 text-center p-0 mt-3 mb-2"> 
+                        <div class="col"> 
                             <div class="px-0 pt-4 pb-0 mt-3 mb-3"> 
-                                <form id="form"> 
+                                <div class="row-11 row-sm-9 row-md-7  row-lg-6 row-xl-5 text-center p-0 mt-3 mb-2">
                                     <ul id="progressbar"> 
                                         <li class="active" id="step1"> 
                                             <strong>Step 1</strong> 
@@ -26,8 +24,9 @@
                                     </ul> 
                                     <div class="progress"> 
                                         <div class="progress-bar"></div> 
-                                    </div> <br> 
-                                    <fieldset> 
+                                    </div> <br>
+                                </div> 
+                                    <fieldset class="text-center"> 
                                         <h2>Choose a .csv file to analyze</h2> 
                                         <!-- STEP 1-->
                                         <div class="container" id="step1" style="display:block">
@@ -38,10 +37,11 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        
                                         <input type="button" name="next-step1" id="next-step1" class="next-step" value="Next Step" style="display: none"/>
                                         
                                     </fieldset> 
-                                    <fieldset hidden id="fieldset2"> 
+                                    <fieldset hidden id="fieldset2" class="text-center"> 
                                         <h2>Welcome To GFG Step 2</h2> 
 
                                         <!-- STEP 2-->
@@ -49,14 +49,11 @@
                                                 <div class="row">
                                                     <div id="grid"></div>
                                                 </div>
-                                                <div class="row text-center mt-3">
-                                                <button class="btn btn-success" onclick="sendData()">Start Analysis</button>
-                                                </div>
                                             </div>
 
-
-                                        <input type="button" name="next-step" lass="next-step" value="Next Step" /> 
-                                        <input type="button" name="previous-step"  class="previous-step" value="Previous Step" /> 
+                                        <button id="gay" class="btn btn-primary" onclick="sendData()">AASDADAD</button>
+                                        <input type="button" name="next-step2" id="next-step2" class="next-step" value="Next Step"/>
+                                        <input type="button" name="previous-step2"  class="previous-step" value="Previous Step" /> 
                                     </fieldset> 
                                     <fieldset style="display:none"> 
                                         <h2>Welcome To GFG Step 3</h2> 
@@ -84,7 +81,6 @@
                                             class="previous-step" 
                                             value="Previous Step" /> 
                                     </fieldset> 
-                                </form> 
                             </div> 
                         </div> 
                     </div> 
@@ -92,7 +88,6 @@
             </div>
             </div>
 
-        </form>
 <script src="https://code.datagridxl.com/datagridxl2.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.1/papaparse.min.js"></script>
 <script>
@@ -268,11 +263,6 @@ function showProgress(){
     function sendData(){
         console.log(grid.getData());
     }
-
-
-
-     
-    
 
     
 

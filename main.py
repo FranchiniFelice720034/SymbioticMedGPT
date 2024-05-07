@@ -50,14 +50,14 @@ app.mount("/static", StaticFiles(directory="static"), name='static')
 
 # WEB INTERFACE ----------------------------------------------------------------------------------------
 
-@app.get("/")
+""" @app.get("/home")
 def home(request: Request):
     left = 'Fernando'
     right = 'Nicotera'
     return templates.TemplateResponse(request, name="home.html", context={'id1': left, 'id2':right})
+ """
 
-
-@app.get("/index")
+@app.get("/")
 def index(request: Request):
     return templates.TemplateResponse(request, name="provahome/index.html")
 
