@@ -5,6 +5,12 @@ from langchain_community.llms import LlamaCpp
 from langchain_experimental.agents import create_csv_agent
 from fastapi.templating import Jinja2Templates #frontend library
 from fastapi.staticfiles import StaticFiles #images
+from fastapi import Request
+import pandas as pd
+import logging
+from pydantic import BaseModel
+
+
 
 model_path=".\llms\mistral-7b-v0.1.Q6_K.gguf"
 
@@ -13,6 +19,11 @@ origins = [
     "http://127.0.0.1:5173",
     "http://127.0.0.1:5173/"
 ]
+
+
+logger = logging.getLogger('uvicorn.error')
+logger.setLevel(logging.DEBUG)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -76,3 +87,21 @@ def testbootstrap(request: Request):
 
 
 
+
+
+""" @app.post("/senddata")
+async def senddata(request: Request):
+    body = request.stream()
+    res = [i async for i in body]
+    df = pd.json_normalize(body)
+    df.to_csv('test.csv', index=False, encoding='utf-8')
+ """
+
+class ObjectListItem(BaseModel):
+    item: str
+
+@app.post("/senddata")
+async def get_body(request: Request):
+    data = await request.json()
+    df = pd.json_normalize(data)
+    df.to_csv('test.csv', index=False, encoding='utf-8')
