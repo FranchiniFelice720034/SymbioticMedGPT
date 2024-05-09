@@ -6,9 +6,11 @@
     <link rel="stylesheet" href="static/css/progressbarstyle.css">
     <link rel="stylesheet" href="static/css/round_btn.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    
     <link rel="stylesheet" href="static/css/csv_page.css"> 
 </head>
+
+
+<body style="background-color: #88b2ccda;">
     <div class="container">
             <!-- progressbar -->
             <div class="row">
@@ -45,7 +47,7 @@
                                         
                                     </fieldset> 
                                     <fieldset hidden id="fieldset2" class="text-center"> 
-                                        <h2>Welcome To GFG Step 2</h2> 
+                                        <h2>Select features to analyze</h2> 
 
                                         <!-- STEP 2-->
                                             <div class="mt-5" id="grid_csv">
@@ -54,17 +56,20 @@
                                                 </div>
                                             </div>
 
-            
-                                        
-                                            <button type="button" class="btn btn-info btn-circle" onclick="undo()"></button>
-                                            <button type="button" class="btn btn-info btn-circle" onclick="redo()"></button>
-                                            <button type="button"
-                                            class="btn btn-lg btn-outline-primary">
-                                             <i class="fa fa-home"></i>
+                                             <button type="button" class="btn btn-lg btn-outline-primary" onclick="undo()">
+                                             <i class="fa fa-undo"></i>
                                              </button>
 
+                                             <button type="button" class="btn btn-lg btn-outline-primary" onclick="redo()" >
+                                             <i class="fa fa-rotate-right" ></i>
+                                             </button>
 
-                                        <input type="button" name="next-step2" id="next-step2" class="next-step" value="Next Step"/>
+                                            <div class="row" id="cblist">
+
+                                            </div>
+
+
+                                        <input type="button" name="next-step2" id="next-step2" class="next-step" value="Next Step" style="display: none" />
                                         <input type="button" name="previous-step2"  class="previous-step" value="Previous Step" /> 
                                     </fieldset> 
                                     <fieldset style="display:none"> 
@@ -100,204 +105,9 @@
             </div>
             </div>
 
+</body>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.2/jquery.min.js" integrity="sha512-tWHlutFnuG0C6nQRlpvrEhE4QpkG1nn2MOUMWmUeRePl4e3Aki0VB6W1v3oLjFtd0hVOtRQ9PHpSfN6u6/QXkQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://code.datagridxl.com/datagridxl2.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.1/papaparse.min.js"></script>
-<script>
-
-    
-//Progress Bar
-
-$(document).ready(function () { 
-    var currentGfgStep, nextGfgStep, previousGfgStep; 
-    var opacity; 
-    var current = 1; 
-    var steps = $("fieldset").length; 
-  
-    setProgressBar(current); 
-  
-
-/*
-    $(".next-step").click(function () { 
-  
-        currentGfgStep = $(this).parent(); 
-        nextGfgStep = $(this).parent().next(); 
-  
-        $("#progressbar li").eq($("fieldset") 
-            .index(nextGfgStep)).addClass("active"); 
-  
-        nextGfgStep.show(); 
-        currentGfgStep.animate({ opacity: 0 }, { 
-            step: function (now) { 
-                opacity = 1 - now; 
-  
-                currentGfgStep.css({ 
-                    'display': 'none', 
-                    'position': 'relative'
-                }); 
-                nextGfgStep.css({ 'opacity': opacity }); 
-            }, 
-            duration: 500 
-        }); 
-        setProgressBar(++current); 
-    });  */
-    
-    $('#next-step1').click(function () { 
-        currentGfgStep = $('#next-step1').parent(); 
-        nextGfgStep = $('#next-step1').parent().next(); 
-
-        $("#progressbar li").eq($("fieldset") 
-            .index(nextGfgStep)).addClass("active"); 
-
-        nextGfgStep.show(); 
-        currentGfgStep.animate({ opacity: 0 }, { 
-            step: function (now) { 
-                opacity = 1 - now; 
-                currentGfgStep.css({ 
-                    'display': 'none', 
-                    'position': 'relative'
-                }); 
-                nextGfgStep.css({ 'opacity': opacity }); 
-            }, 
-            duration: 500 
-        }); 
-        setProgressBar(++current);
-        console.log("SHOWnext");
-        document.getElementById("fieldset2").hidden = false;
-
-        });   
-    
-
-
-    $(".previous-step").click(function () { 
-        
-        currentGfgStep = $(this).parent(); 
-        previousGfgStep = $(this).parent().prev(); 
-  
-        $("#progressbar li").eq($("fieldset") 
-            .index(currentGfgStep)).removeClass("active"); 
-  
-        previousGfgStep.show(); 
-  
-        currentGfgStep.animate({ opacity: 0 }, { 
-            step: function (now) { 
-                opacity = 1 - now; 
-  
-                currentGfgStep.css({ 
-                    'display': 'none', 
-                    'position': 'relative'
-                }); 
-                previousGfgStep.css({ 'opacity': opacity }); 
-            }, 
-            duration: 500 
-        }); 
-        setProgressBar(--current);
-    }); 
-  
-    function setProgressBar(currentStep) { 
-        var percent = parseFloat(100 / steps) * current; 
-        percent = percent.toFixed(); 
-        $(".progress-bar") 
-            .css("width", percent + "%") 
-    } 
-  
-    $(".submit").click(function () { 
-        return false; 
-    }) 
-}); 
-
-
-/////------------------JAVASCRIPT--------------------------------///////
-
-//STEP 1
-
-function showProgress(){
-        var progress = document.getElementById('progressbar');
-        progress.style.display = "block"
-    }
-
-    //Check if the file is .csv 
-    var file = document.getElementById('csv-file');
-
-    file.onchange = function(e) {
-    var ext = this.value.match(/\.([^\.]+)$/)[1];
-    switch (ext) {
-        case 'csv':
-
-            break;
-        default:
-            alert('Insert a csv file');
-            this.value = '';
-        }
-    };
-
-    //CSV GRID
-    var csvFile = document.getElementById("csv-file");
-    var visual_grid = document.getElementById("grid_csv");
-    var next_step1 = document.getElementById("next-step1");
-
-    var flag = true;
-    // create empty grid
-    var grid = new DataGridXL("grid", {
-        data: DataGridXL.createEmptyData(20,20)
-    });
-
-
-
-    csvFile.onchange = function(e){
-        //This will be done only once the csv is initialized
-        if(flag){
-            next_step1.style.display ='block';
-            flag = false;
-            document.getElementById("fieldset2").hidden = false;
-            console.log("SHOWcsv");
-        }
-        var file = e.target.files[0];
-        console.log("popolocsv");
-            Papa.parse(file, {
-            header: true,
-            dynamicTyping: true,
-            complete: function(results) {
-
-                // overwrite grid with new data
-                grid = new DataGridXL("grid", {
-                    data: results.data
-                });
-                document.getElementById("fieldset2").hidden = true;
-                console.log("HIDEcsv");
-
-            }
-            
-        });
-        
-    }
-
-
-
-    var url = document.getElementById("progressbar").getAttribute('data-url');
-    function sendData(){
-        csv_data = grid.getData();
-        console.log(grid.getData());
-        $.ajax({ 
-            type: "POST",
-            url: url+'senddata',
-            data: JSON.stringify(csv_data),
-            success: function(data){        
-                console.log(data);
-            },
-            error: function(err){
-                console.log(err);
-            }
-        });
-    }
-
-    function redo(){
-        grid.redo();
-    }
-    function undo(){
-        grid.undo();
-    }
-
-    
-
-</script>
+<script src="static/js/progressbar.js"></script>

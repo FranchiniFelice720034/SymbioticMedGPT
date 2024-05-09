@@ -9,10 +9,10 @@ from fastapi import Request
 import pandas as pd
 import logging
 from pydantic import BaseModel
-import os
+import json
 
 
-model_path="./llms/mistral-7b-v0.1.Q2_K.gguf"
+model_path="./llms/mistral-7b-v0.1.Q6_K.gguf"
 csv_uploaded_path="csv/uploaded/"
 
 origins = [
@@ -105,7 +105,9 @@ class ObjectListItem(BaseModel):
 async def get_body(request: Request):
     data = await request.json()
     df = pd.json_normalize(data)
+    print(df['table'])
+    print(df['indvariables'][0][0])
 
-    n_files = len(os.listdir(csv_uploaded_path)) # your directory path
+    #n_files = len(os.listdir(csv_uploaded_path)) # your directory path
 
-    df.to_csv('csv/uploaded/csv_'+str(n_files)+'.csv', index=False, encoding='utf-8')
+    #df.to_csv('csv/uploaded/csv_'+str(n_files)+'.csv', index=False, encoding='utf-8')

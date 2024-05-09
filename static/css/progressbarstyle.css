@@ -8,7 +8,7 @@ html {
 } 
   
 h2{ 
-    color: #2F8D46; 
+    color: #282120; 
 } 
 #form { 
     text-align: center; 
@@ -60,25 +60,25 @@ h2{
 } 
   
 .form, .previous-step { 
-    background: #2F8D46; 
+    background: #FAD02C; 
 } 
   
 .form, .next-step { 
-    background: #2F8D46; 
+    background: #FAD02C; 
 } 
   
 #form .previous-step:hover, 
 #form .previous-step:focus { 
-    background-color: #2F8D46;
+    background-color: #FAD02C;
 } 
   
 #form .next-step:hover, 
 #form .next-step:focus { 
-    background-color: #2F8D46;
+    background-color: #FAD02C;
 } 
   
 .text { 
-    color: #2F8D46; 
+    color: #FAD02C; 
     font-weight: normal;
 } 
   
@@ -89,7 +89,7 @@ h2{
 } 
   
 #progressbar .active { 
-    color: #2F8D46
+    color: #FAD02C
 } 
   
 #progressbar li { 
@@ -143,7 +143,7 @@ h2{
   
 #progressbar li.active:before, 
 #progressbar li.active:after { 
-    background: #2F8D46
+    background: #FAD02C
 } 
   
 .progress { 
@@ -151,5 +151,15 @@ h2{
 } 
   
 .progress-bar { 
-    background-color: #2F8D46
+    background-color: #FAD02C
 }
+/*For CB*/
+.checkboxes {
+    text-align:center;
+  }
+.checkboxes input{
+    margin: 0px 0px 0px 0px;
+  }
+.checkboxes label{
+    margin: 0px 20px 0px 3px;
+  }
