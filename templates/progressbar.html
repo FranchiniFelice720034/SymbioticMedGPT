@@ -4,6 +4,9 @@
     <script src='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js'> </script> 
     <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'> </script> 
     <link rel="stylesheet" href="static/css/progressbarstyle.css">
+    <link rel="stylesheet" href="static/css/round_btn.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
     <link rel="stylesheet" href="static/css/csv_page.css"> 
 </head>
     <div class="container">
@@ -16,7 +19,7 @@
                                 <div class="row-11 row-sm-9 row-md-7  row-lg-6 row-xl-5 text-center p-0 mt-3 mb-2">
                                     <ul id="progressbar" data-url="{{request.base_url}}"> 
                                         <li class="active" id="step1"> 
-                                            <strong>Step 1</strong> 
+                                            <strong>Step 1</strong>
                                         </li> 
                                         <li id="step2"><strong>Step 2</strong></li> 
                                         <li id="step3"><strong>Step 3</strong></li> 
@@ -51,9 +54,14 @@
                                                 </div>
                                             </div>
 
-                                        <button id="gay" class="btn btn-primary" onclick="sendData()">AASDADAD</button>
-                                        <button class="btn btn-primary" onclick="undo()">Undo</button>
-                                        <button class="btn btn-primary" onclick="redo()">Rendo</button>
+            
+                                        
+                                            <button type="button" class="btn btn-info btn-circle" onclick="undo()"></button>
+                                            <button type="button" class="btn btn-info btn-circle" onclick="redo()"></button>
+                                            <button type="button"
+                                            class="btn btn-lg btn-outline-primary">
+                                             <i class="fa fa-home"></i>
+                                             </button>
 
 
                                         <input type="button" name="next-step2" id="next-step2" class="next-step" value="Next Step"/>
