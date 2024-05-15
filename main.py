@@ -86,6 +86,10 @@ def testbootstrap(request: Request):
 def testbootstrap(request: Request):
     return templates.TemplateResponse(request, name="csv.html")
 
+@app.get("/Step3")
+def Step3(request: Request):
+    return templates.TemplateResponse(request, name="Step3.html")
+
 
 
 

@@ -116,6 +116,8 @@ function showProgress(){
             this.value = '';
         }
     };
+
+
     var csvFile = document.getElementById("csv-file");
     var visual_grid = document.getElementById("grid_csv");
     var next_step1 = document.getElementById("next-step1");
@@ -129,7 +131,21 @@ function showProgress(){
         showCBlist(grid.getData());
     };
 
-    
+    //Handler for checking if the old header is modified
+    var setCellHandler = function(gridEvent){
+        console.log(gridEvent);
+        if(gridEvent.rowIds[0] == 1){
+            idlabel=gridEvent.colIds[0]-1;
+            document.getElementById("cblabel"+idlabel).innerHTML=gridEvent.values[0]
+        }
+    };
+
+
+
+    var csv_data_edit = null;
+    var header_old = null;
+
+
     //Listener for file input
     csvFile.onchange = function(e){
         //This will be done only once the csv is initialized
@@ -144,13 +160,32 @@ function showProgress(){
             header: true,
             dynamicTyping: true,
             complete: function(results) {
-
+                csv_data_edit = results.data;
+                header_old = Object.keys(csv_data_edit[0]);
+                var new_row = {};
+                
+                for(i = 0; i<header_old.length; i++){
+                    if (header_old[i] !== i) {
+                        for(j = 0; j<csv_data_edit.length; j++){
+                            Object.defineProperty(csv_data_edit[j], i+1,
+                                Object.getOwnPropertyDescriptor(csv_data_edit[j], header_old[i]));
+                            delete csv_data_edit[j][header_old[i]];
+                        }
+                    }
+                    new_row[i+1] = header_old[i]; 
+                }
+                csv_data_edit.unshift(new_row);
+                
                 // overwrite grid with new data
                 grid = new DataGridXL("grid", {
-                    data: results.data
+                    data: results.data,
+                    allowEditCells: true,
                 });
+
+                
                 //Activation of delete listener
                 grid.events.on('deletecols', deleteColsHandler);
+                grid.events.on('setcellvalues', setCellHandler);
                 document.getElementById("fieldset2").hidden = true;
             }
             
@@ -193,9 +228,9 @@ function showProgress(){
                 FLAG_ALREADY_POP = false;
             }
             document.getElementById("cblist").innerHTML += '<div class="form-check" required>\
-                                                                <input id="cb" class="form-check-input" type="checkbox" value="'+csv_head[i]+'" id="flexCheckDefault" onchange="setVal()">\
-                                                                    <label class="form-check-label text-left" for="flexCheckDefault"  style="margin-right:100%">\
-                                                                    '+csv_head[i]+'\
+                                                                <input id="cb'+i+'" class="form-check-input" type="checkbox" value="'+header_old[i]+'" id="flexCheckDefault'+i+'" onchange="setVal()">\
+                                                                    <label class="form-check-label text-left" for="flexCheckDefault"  style="margin-right:100%" id="cblabel'+i+'">\
+                                                                    '+header_old[i]+'\
                                                                     </label>\
                                                             </div>';
             if(i == csv_head.length-1){
@@ -207,7 +242,7 @@ function showProgress(){
 
     var checkboxes = null;
     function setVal(){
-        checkboxes = document.querySelectorAll('#cb');
+        checkboxes = document.querySelectorAll('[id^=cb]');
         for (let i = 0; i < checkboxes.length; i++) {
             if (checkboxes[i].checked){
                 next_step2.style.display = "block";

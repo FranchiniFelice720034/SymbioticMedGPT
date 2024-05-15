@@ -104,6 +104,10 @@ body {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
+.container:hover .overlay {
+  opacity: 1;
+}
+
 hr {
   margin: 1rem 0;
   color: inherit;
@@ -11313,4 +11317,12 @@ section#contact form#contactForm :-ms-input-placeholder {
   text-align: center;
   font-size: 0.9rem;
   font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+#playbutton{
+  color:white;
+  transition: 0.5s;
+}
+#playbutton:hover {
+  color: green;
 }
