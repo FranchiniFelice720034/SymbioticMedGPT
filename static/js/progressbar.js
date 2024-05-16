@@ -56,6 +56,7 @@ $(document).ready(function () {
         console.log("SHOWnext");
         document.getElementById("fieldset2").hidden = false;
         showCBlist(grid.getData());
+        showradiolist(grid.getData());
         });   
     
 
@@ -163,13 +164,17 @@ function showProgress(){
                 csv_data_edit = results.data;
                 header_old = Object.keys(csv_data_edit[0]);
                 var new_row = {};
-                
                 for(i = 0; i<header_old.length; i++){
                     if (header_old[i] !== i) {
                         for(j = 0; j<csv_data_edit.length; j++){
-                            Object.defineProperty(csv_data_edit[j], i+1,
-                                Object.getOwnPropertyDescriptor(csv_data_edit[j], header_old[i]));
-                            delete csv_data_edit[j][header_old[i]];
+                            try{
+                                Object.defineProperty(csv_data_edit[j], i+1,
+                                    Object.getOwnPropertyDescriptor(csv_data_edit[j], header_old[i]));
+                                delete csv_data_edit[j][header_old[i]];
+                            }catch (error){
+                                console.log('Riga vuota');
+                            }
+                            
                         }
                     }
                     new_row[i+1] = header_old[i]; 
@@ -228,7 +233,7 @@ function showProgress(){
                 FLAG_ALREADY_POP = false;
             }
             document.getElementById("cblist").innerHTML += '<div class="form-check" required>\
-                                                                <input id="cb'+i+'" class="form-check-input" type="checkbox" value="'+header_old[i]+'" id="flexCheckDefault'+i+'" onchange="setVal()">\
+                                                                <input id="cb'+i+'" class="form-check-input" type="checkbox" value="'+header_old[i]+'" onchange="setVal()">\
                                                                     <label class="form-check-label text-left" for="flexCheckDefault"  style="margin-right:100%" id="cblabel'+i+'">\
                                                                     '+header_old[i]+'\
                                                                     </label>\
@@ -240,6 +245,7 @@ function showProgress(){
     }
 
 
+
     var checkboxes = null;
     function setVal(){
         checkboxes = document.querySelectorAll('[id^=cb]');
@@ -249,6 +255,41 @@ function showProgress(){
                 break;
             }
             if(i == checkboxes.length - 1){
+                next_step2.style.display = "none";
+            }
+        }
+    }
+
+    //Radio Button function
+
+    function showradiolist(data){
+        csv_head = Object.keys(data[0]);
+        for(var i = 0; i < csv_head.length; i++) {
+            if(FLAG_ALREADY_POP){
+                document.getElementById("rlist").innerHTML = '';
+                FLAG_ALREADY_POP = false;
+            }
+            document.getElementById("rlist").innerHTML += '<div class="form-check" required>\
+                                                            <input class="form-check-input" type="radio" name="flexRadioDefault" "r'+i+'">\
+                                                                <label class="form-check-label" for="flexRadioDefault1" id="cblabel'+i+'">\
+                                                                '+header_old[i]+'\
+                                                                </label>\
+                                                            </div>';
+            if(i == csv_head.length-1){
+                FLAG_ALREADY_POP = true;
+            }
+        }
+    }
+
+    var radios = null;
+    function setRadioVal(){
+        radios = document.querySelectorAll('[id^=r]');
+        for (let i = 0; i < radios.length; i++) {
+            if (radios[i].checked){
+                next_step2.style.display = "block";
+                break;
+            }
+            if(i == radios.length - 1){
                 next_step2.style.display = "none";
             }
         }

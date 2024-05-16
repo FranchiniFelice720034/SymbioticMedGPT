@@ -50,22 +50,50 @@
                                         <h2>Select features to analyze</h2> 
 
                                         <!-- STEP 2-->
+                                        
+
+
                                             <div class="mt-5" id="grid_csv">
                                                 <div class="row">
                                                     <div id="grid"></div>
                                                 </div>
                                             </div>
 
-                                             <button type="button" class="btn btn-lg btn-outline-primary" onclick="undo()">
-                                             <i class="fa fa-undo"></i>
-                                             </button>
+                                            <button type="button" class="btn btn-lg btn-outline-success" onclick="undo()" style="color:green;">
+                                                <i class="fa fa-undo"></i>
+                                                </button>
+    
+                                                <button type="button" class="btn btn-lg btn-outline-success" onclick="redo()" style="color:green;">
+                                                <i class="fa fa-rotate-right" ></i>
+                                            </button>
 
-                                             <button type="button" class="btn btn-lg btn-outline-primary" onclick="redo()" >
-                                             <i class="fa fa-rotate-right" ></i>
-                                             </button>
-
-                                            <div class="row" id="cblist">
-
+                                             <div class="row">
+                                                
+                                                <div class="col">
+                                                    <div class="fs-1">Select the independent variables</div>
+                                                  
+                                                </div>
+                            
+                                                <div class="col">
+                                                    <div class="fs-1">Select the dependent variable</div>
+    
+                                                </div>
+                                                
+                                            </div>
+                                             
+                                            <div class="row">
+                                                
+                                                <div class="col" id="cblist">
+                                                    
+                                                  
+                                                </div>
+                                                
+                                                
+                                                <div class="col" id="rlist">
+                                                    
+                
+                                                </div>
+                                                
                                             </div>
 
 
