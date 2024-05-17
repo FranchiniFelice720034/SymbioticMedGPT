@@ -84,6 +84,7 @@ $(document).ready(function () {
             duration: 500 
         }); 
         setProgressBar(--current);
+        next_step2.style.display = "none"; //Rende invisibile il bottone 
     }); 
   
     function setProgressBar(currentStep) { 
@@ -172,8 +173,9 @@ function showProgress(){
                                     Object.getOwnPropertyDescriptor(csv_data_edit[j], header_old[i]));
                                 delete csv_data_edit[j][header_old[i]];
                             }catch (error){
+                                csv_data_edit.pop();
                                 console.log('Riga vuota');
-                            }
+                            }   
                             
                         }
                     }
@@ -186,33 +188,56 @@ function showProgress(){
                     data: results.data,
                     allowEditCells: true,
                 });
-
-                
                 //Activation of delete listener
                 grid.events.on('deletecols', deleteColsHandler);
                 grid.events.on('setcellvalues', setCellHandler);
                 document.getElementById("fieldset2").hidden = true;
             }
-            
         });
-        
     }
     
     //Sending table data to backend
     var url = document.getElementById("progressbar").getAttribute('data-url');
+    function getIndepVars(){
+        var indep_var = [];
+        for(i = 0; i<header_old.length; i++){
+            var checkbox = document.getElementById('cb'+i);
+            if(checkbox.checked){
+                indep_var.push(checkbox.value);indep_var
+            }
+        }
+
+        return indep_var;
+    }
+
+    function getDepVars(){
+        var dep_var = null;
+        for(i = 0; i<header_old.length; i++){
+            var radio_v = document.getElementById('r'+i);
+            if(radio_v.checked){
+                dep_var = radio_v.value;
+                break;
+            }
+        }
+        return dep_var;
+    }
+
     function sendData(){
         csv_data = grid.getData();
         console.log(grid.getData());
+        var ind_var = getIndepVars();
+        var dep_var = getDepVars();
         $.ajax({ 
             type: "POST",
             url: url+'senddata',
-            data: JSON.stringify({"table": csv_data, "indvariables": ["ciao"]}),
+            data: JSON.stringify({"table": csv_data, "indep_var": ind_var, "dep_var": dep_var}),
             success: function(data){        
                 console.log(data);
             },
             error: function(err){
                 console.log(err);
             }
+            
             
         });
     }
@@ -245,23 +270,24 @@ function showProgress(){
     }
 
 
-
     var checkboxes = null;
     function setVal(){
         checkboxes = document.querySelectorAll('[id^=cb]');
+        radios = document.querySelectorAll('[id^=r]');
         for (let i = 0; i < checkboxes.length; i++) {
-            if (checkboxes[i].checked){
-                next_step2.style.display = "block";
-                break;
-            }
-            if(i == checkboxes.length - 1){
-                next_step2.style.display = "none";
+            if ($("input[type=radio]:checked").length > 0) {
+                if (checkboxes[i].checked){
+                    next_step2.style.display = "block";
+                    break;
+                }
+                if(i == checkboxes.length - 1){
+                    next_step2.style.display = "none";
+                }
             }
         }
     }
 
     //Radio Button function
-
     function showradiolist(data){
         csv_head = Object.keys(data[0]);
         for(var i = 0; i < csv_head.length; i++) {
@@ -270,27 +296,13 @@ function showProgress(){
                 FLAG_ALREADY_POP = false;
             }
             document.getElementById("rlist").innerHTML += '<div class="form-check" required>\
-                                                            <input class="form-check-input" type="radio" name="flexRadioDefault" "r'+i+'">\
-                                                                <label class="form-check-label" for="flexRadioDefault1" id="cblabel'+i+'">\
+                                                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="r'+i+'" onchange="setVal()" value='+header_old[i]+'>\
+                                                                <label class="form-check-label text-left" for="flexRadioDefault1" id="cblabel'+i+'" style="margin-right:100%">\
                                                                 '+header_old[i]+'\
                                                                 </label>\
                                                             </div>';
             if(i == csv_head.length-1){
                 FLAG_ALREADY_POP = true;
-            }
-        }
-    }
-
-    var radios = null;
-    function setRadioVal(){
-        radios = document.querySelectorAll('[id^=r]');
-        for (let i = 0; i < radios.length; i++) {
-            if (radios[i].checked){
-                next_step2.style.display = "block";
-                break;
-            }
-            if(i == radios.length - 1){
-                next_step2.style.display = "none";
             }
         }
     }

@@ -1,1 +1,0 @@
-MODEL_PATH  = ".\llms\mistral-7b-v0.1.Q6_K.gguf"

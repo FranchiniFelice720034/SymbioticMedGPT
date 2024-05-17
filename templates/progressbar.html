@@ -11,7 +11,9 @@
 
 
 <body style="background-color: #88b2ccda;">
+
     <div class="container">
+        
             <!-- progressbar -->
             <div class="row">
                 <div class="container"> 
@@ -59,12 +61,14 @@
                                                 </div>
                                             </div>
 
-                                            <button type="button" class="btn btn-lg btn-outline-success" onclick="undo()" style="color:green;">
+                                            <button type="button" class="btn btn-lg btn-outline-success" onclick="undo()">
                                                 <i class="fa fa-undo"></i>
                                                 </button>
     
-                                                <button type="button" class="btn btn-lg btn-outline-success" onclick="redo()" style="color:green;">
+                                                <button type="button" class="btn btn-lg btn-outline-success" onclick="redo()">
                                                 <i class="fa fa-rotate-right" ></i>
+
+                                                <button class="btn btn-danger" onclick="sendData()">Test</button>
                                             </button>
 
                                              <div class="row">
@@ -96,8 +100,10 @@
                                                 
                                             </div>
 
-
-                                        <input type="button" name="next-step2" id="next-step2" class="next-step" value="Next Step" style="display: none" />
+                                         <a href="/Step3">
+                                           <input type="button" name="next-step2" id="next-step2" class="next-step" action="GET" value="Next Step" style="display: none"/>
+                                         </a>  
+                                        
                                         <input type="button" name="previous-step2"  class="previous-step" value="Previous Step" /> 
                                     </fieldset> 
                                     <fieldset style="display:none"> 
