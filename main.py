@@ -1,6 +1,7 @@
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, File, UploadFile, Request
+from fastapi.responses import JSONResponse
 from langchain_community.llms import LlamaCpp
 from langchain_experimental.agents import create_csv_agent
 from fastapi.templating import Jinja2Templates #frontend library
@@ -21,7 +22,6 @@ origins = [
     "http://127.0.0.1:5173",
     "http://127.0.0.1:5173/"
 ]
-
 
 logger = logging.getLogger('uvicorn.error')
 logger.setLevel(logging.DEBUG)
@@ -47,13 +47,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-@app.get("/execute", tags=["Execute"])
+@app.get("/execute", tags=["Use Model"])
 def _execute_model(request: Request, query: str):
     result = request.app.state.csv_agent.run(query)
     return result
 
-
+@app.post("/upload-csv", tags=["Use Model"])
+async def upload_csv(file: UploadFile = File(...)):
+    if file.content_type != 'text/csv':
+        return {"error": "File type not supported"}
+    df = pd.read_csv(file.file)
+    app.state.df = df
+    return JSONResponse(content=json.loads(df.head().to_json(orient="records")))
 
 templates = Jinja2Templates(directory="templates")
 
@@ -70,20 +75,20 @@ def home(request: Request):
     return templates.TemplateResponse(request, name="home.html", context={'id1': left, 'id2':right})
  """
 
-@app.get("/")
+@app.get("/", tags=["Frontend"])
 def index(request: Request):
     return templates.TemplateResponse(request, name="provahome/index.html")
 
-@app.get("/progressbar")
+@app.get("/progressbar", tags=["Frontend"])
 def progressbar(request: Request):
 
     return templates.TemplateResponse(request, name="progressbar.html")
 
-@app.get("/testbootstrap")
+@app.get("/testbootstrap", tags=["Frontend"])
 def testbootstrap(request: Request):
     return templates.TemplateResponse(request, name="testbootstrap.html")
 
-@app.get("/csv")
+@app.get("/csv", tags=["Frontend"])
 def testbootstrap(request: Request):
     return templates.TemplateResponse(request, name="csv.html")
 
