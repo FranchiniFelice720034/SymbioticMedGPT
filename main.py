@@ -18,7 +18,7 @@ import time
 import json 
 import random
 
-model_path="./llms/mistral-7b-v0.1.Q5_0.gguf"
+model_path="./llms/mistral-7b-v0.1.Q6_K.gguf"
 csv_uploaded_path="csv/uploaded/"
 
 origins = [
@@ -173,15 +173,16 @@ class ObjectListItem(BaseModel):
 @app.post("/senddata", tags=["Frontend"])
 async def get_body(request: Request):
     data = await request.json()
-    df = pd.json_normalize(data)
-    print(df['table'])
-    print(df['indep_var'][0])
-    print(df['dep_var'][0])
+    df = pd.json_normalize(data['table'])
+    header = df.loc[0, :].values.tolist()
+    df = df.iloc[1: ]
+    
+    df.columns = header
 
     if(not os.path.isdir(csv_uploaded_path)):
         os.mkdir(csv_uploaded_path)
     
     ts = time.time()
     ts = datetime.datetime.fromtimestamp(ts).strftime('%d-%m-%Y-%H-%M-%S')
-
+    print(df)
     df.to_csv('csv/uploaded/csv_'+str(ts)+'.csv', index=False, encoding='utf-8')

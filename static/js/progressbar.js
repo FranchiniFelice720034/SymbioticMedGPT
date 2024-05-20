@@ -128,17 +128,29 @@ function showProgress(){
     var csv_head = null;
     var flag = true;
     var FLAG_ALREADY_POP = false;
+
     //Handler for deletion of columns
     var deleteColsHandler = function(gridEvent){ 
+        //Delete checkboxes and radio of the delated columns
+        let incremental = 1;
+        new_head = Object.keys(grid.getData()[0]);
+        for(i = 0; i<new_head.length; i++){
+            if(i+incremental != parseInt(new_head[i])){
+                header_old.splice(i, 1);
+                incremental++;
+            }
+        }    
         showCBlist(grid.getData());
+        showradiolist(grid.getData());
+
     };
 
     //Handler for checking if the old header is modified
     var setCellHandler = function(gridEvent){
-        console.log(gridEvent);
         if(gridEvent.rowIds[0] == 1){
             idlabel=gridEvent.colIds[0]-1;
             document.getElementById("cblabel"+idlabel).innerHTML=gridEvent.values[0]
+            document.getElementById("rlabel"+idlabel).innerHTML=gridEvent.values[0]
         }
     };
 
@@ -168,13 +180,13 @@ function showProgress(){
                 for(i = 0; i<header_old.length; i++){
                     if (header_old[i] !== i) {
                         for(j = 0; j<csv_data_edit.length; j++){
+                            //Try catch for checking the existence of a empty row
                             try{
                                 Object.defineProperty(csv_data_edit[j], i+1,
                                     Object.getOwnPropertyDescriptor(csv_data_edit[j], header_old[i]));
                                 delete csv_data_edit[j][header_old[i]];
                             }catch (error){
                                 csv_data_edit.pop();
-                                console.log('Riga vuota');
                             }   
                             
                         }
@@ -224,7 +236,6 @@ function showProgress(){
 
     function sendData(){
         csv_data = grid.getData();
-        console.log(grid.getData());
         var ind_var = getIndepVars();
         var dep_var = getDepVars();
         $.ajax({ 
@@ -244,10 +255,34 @@ function showProgress(){
 
     function redo(){
         grid.redo();
+        //Delete checkboxes and radio of the delated columns
+        let incremental = 1;
+        new_head = Object.keys(grid.getData()[0]);
+        for(i = 0; i<new_head.length; i++){
+            if(i+incremental != parseInt(new_head[i])){
+                header_old.splice(i, 1);
+                incremental++;
+            }
+        }  
+        showCBlist(grid.getData());
+        showradiolist(grid.getData());
     }
 
     function undo(){
         grid.undo();
+        //Repopulate the cblist and radio list back with the deleted columns
+        first_row_value = grid.getData()[0];
+        first_row_keys = Object.keys(grid.getData()[0]);
+        for(i = 0; i<first_row_keys.length; i++){
+            if(i+1 == first_row_keys[i] && header_old[i] != first_row_value[i+1]){
+                if(header_old[i] == first_row_value[i+2]){
+                    header_old.splice(i, 0, first_row_value[i+1]);
+                    i++;
+                }
+            }
+        }
+        showCBlist(grid.getData());
+        showradiolist(grid.getData());
     }
     //Function showing the checkboxes
     function showCBlist(data){
@@ -257,8 +292,8 @@ function showProgress(){
                 document.getElementById("cblist").innerHTML = '';
                 FLAG_ALREADY_POP = false;
             }
-            document.getElementById("cblist").innerHTML += '<div class="form-check" required>\
-                                                                <input id="cb'+i+'" class="form-check-input" type="checkbox" value="'+header_old[i]+'" onchange="setVal()">\
+            document.getElementById("cblist").innerHTML += '<div class="form-check" id="group_cb_'+i+'"required>\
+                                                                <input id="cb'+i+'" class="form-check-input" type="checkbox" value="'+header_old[i]+'" onchange="setVal(this.id, this.type)">\
                                                                     <label class="form-check-label text-left" for="flexCheckDefault"  style="margin-right:100%" id="cblabel'+i+'">\
                                                                     '+header_old[i]+'\
                                                                     </label>\
@@ -269,11 +304,19 @@ function showProgress(){
         }
     }
 
-
-    var checkboxes = null;
-    function setVal(){
-        checkboxes = document.querySelectorAll('[id^=cb]');
-        radios = document.querySelectorAll('[id^=r]');
+    //Checkboxes and Radio Listener
+    function setVal(identifier, type){
+        //Toggle the independent/dependent variable if the relative dependent/independent variable is selected
+        var idnumber = identifier.match(/\d+/)[0];
+        if (type== "radio"){
+            document.getElementById("cb"+idnumber).checked = false;
+            
+        }
+        else{
+            document.getElementById("r"+idnumber).checked = false;
+        }
+        //Check if at least one cb is selected and if the radio is selected
+        var checkboxes = document.querySelectorAll('[id^=cb]');
         for (let i = 0; i < checkboxes.length; i++) {
             if ($("input[type=radio]:checked").length > 0) {
                 if (checkboxes[i].checked){
@@ -284,10 +327,15 @@ function showProgress(){
                     next_step2.style.display = "none";
                 }
             }
+        
         }
+        if ($("input[type=radio]:checked").length == 0){
+            next_step2.style.display = "none";
+        }
+                
     }
 
-    //Radio Button function
+    //Function showing the radios
     function showradiolist(data){
         csv_head = Object.keys(data[0]);
         for(var i = 0; i < csv_head.length; i++) {
@@ -295,9 +343,9 @@ function showProgress(){
                 document.getElementById("rlist").innerHTML = '';
                 FLAG_ALREADY_POP = false;
             }
-            document.getElementById("rlist").innerHTML += '<div class="form-check" required>\
-                                                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="r'+i+'" onchange="setVal()" value='+header_old[i]+'>\
-                                                                <label class="form-check-label text-left" for="flexRadioDefault1" id="cblabel'+i+'" style="margin-right:100%">\
+            document.getElementById("rlist").innerHTML += '<div class="form-check" id="group_r_'+i+'" required>\
+                                                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="r'+i+'" onchange="setVal(this.id, this.type)" value='+header_old[i]+'>\
+                                                                <label class="form-check-label text-left" for="flexRadioDefault1" id="rlabel'+i+'" style="margin-right:100%">\
                                                                 '+header_old[i]+'\
                                                                 </label>\
                                                             </div>';
