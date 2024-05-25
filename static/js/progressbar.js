@@ -139,7 +139,7 @@ function showProgress(){
                 incremental++;
             }
         }    
-        showCBlist(grid.getData());
+        //showCBlist(grid.getData());
         showradiolist(grid.getData());
 
     };
@@ -148,7 +148,7 @@ function showProgress(){
     var setCellHandler = function(gridEvent){
         if(gridEvent.rowIds[0] == 1){
             idlabel=gridEvent.colIds[0]-1;
-            document.getElementById("cblabel"+idlabel).innerHTML=gridEvent.values[0]
+            //document.getElementById("cblabel"+idlabel).innerHTML=gridEvent.values[0]
             document.getElementById("rlabel"+idlabel).innerHTML=gridEvent.values[0]
         }
     };
@@ -353,6 +353,10 @@ function showProgress(){
                 document.getElementById("rlist").innerHTML = '';
                 FLAG_ALREADY_POP = false;
             }
+            console.log(header_old[i].toString());
+            
+            header_old[i] = header_old[i].replaceAll(' ', '&nbsp');
+            header_old[i] = header_old[i].replaceAll('-', '&#8209;');
             document.getElementById("rlist").innerHTML += '<div class="form-check" id="group_r_'+i+'" required>\
                                                             <input class="form-check-input" type="radio" name="flexRadioDefault" id="r'+i+'" onchange="setVal(this.id, this.type)" value='+header_old[i]+'>\
                                                                 <label class="form-check-label text-left" for="flexRadioDefault1" id="rlabel'+i+'" style="margin-right:100%;">\
@@ -400,3 +404,14 @@ function showProgress(){
           });
     }
       
+    //SweetAlert2 help modal
+    function firehelpmodal(){
+        
+        swalWithBootstrapButtons.fire({
+            html: 'You can cut, sort, delete columns and rows by <br> left-clicking on them.<br>You can edit the text inside the cells by <br> double-clicking on them.',
+            imageUrl: "https://raw.githubusercontent.com/DataGridXL/DataGridXL1/master/images/javascript-spreadsheet.png",
+            imageWidth: 800,
+            imageHeight: 400
+          });
+    }
+    
