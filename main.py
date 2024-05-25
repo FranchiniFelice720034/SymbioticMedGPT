@@ -18,7 +18,7 @@ import time
 import json 
 import random
 
-model_path="./llms/mistral-7b-v0.1.Q6_K.gguf"
+model_path="./llms/mistral-7b-v0.1.Q2_K.gguf"
 csv_uploaded_path="csv/uploaded/"
 
 origins = [

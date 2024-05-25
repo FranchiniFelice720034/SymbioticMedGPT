@@ -53,9 +53,8 @@ $(document).ready(function () {
             duration: 500 
         }); 
         setProgressBar(++current);
-        console.log("SHOWnext");
         document.getElementById("fieldset2").hidden = false;
-        showCBlist(grid.getData());
+        //showCBlist(grid.getData());
         showradiolist(grid.getData());
         });   
     
@@ -76,8 +75,8 @@ $(document).ready(function () {
                 opacity = 1 - now; 
   
                 currentGfgStep.css({ 
-                    'display': 'none', 
-                    'position': 'relative'
+                    'position': 'relative',
+                    'hidden': 'true'
                 }); 
                 previousGfgStep.css({ 'opacity': opacity }); 
             }, 
@@ -162,12 +161,13 @@ function showProgress(){
 
     //Listener for file input
     csvFile.onchange = function(e){
+        
         //This will be done only once the csv is initialized
-        if(flag){
-            next_step1.style.display ='block';
-            flag = false;
-            document.getElementById("fieldset2").hidden = false;
-        }
+        
+        next_step1.style.display ='block';
+        flag = false;
+        document.getElementById("fieldset2").hidden = false;
+        
         var file = e.target.files[0];
 
             Papa.parse(file, {
@@ -200,6 +200,7 @@ function showProgress(){
                     data: results.data,
                     allowEditCells: true,
                 });
+                console.log(grid.getData());
                 //Activation of delete listener
                 grid.events.on('deletecols', deleteColsHandler);
                 grid.events.on('setcellvalues', setCellHandler);
@@ -281,10 +282,11 @@ function showProgress(){
                 }
             }
         }
-        showCBlist(grid.getData());
+        //showCBlist(grid.getData());
         showradiolist(grid.getData());
     }
     //Function showing the checkboxes
+    /*
     function showCBlist(data){
         csv_head = Object.keys(data[0]);
         for(var i = 0; i < csv_head.length; i++) {
@@ -302,12 +304,14 @@ function showProgress(){
                 FLAG_ALREADY_POP = true;
             }
         }
-    }
+    }*/
 
     //Checkboxes and Radio Listener
     function setVal(identifier, type){
+        /*
         //Toggle the independent/dependent variable if the relative dependent/independent variable is selected
         var idnumber = identifier.match(/\d+/)[0];
+        
         if (type== "radio"){
             document.getElementById("cb"+idnumber).checked = false;
             
@@ -329,9 +333,15 @@ function showProgress(){
             }
         
         }
+        */
+        if ($("input[type=radio]:checked").length > 0) {
+            
+                next_step2.style.display = "block";
+                
+            }
         if ($("input[type=radio]:checked").length == 0){
-            next_step2.style.display = "none";
-        }
+                next_step2.style.display = "none";
+            }
                 
     }
 
@@ -345,7 +355,7 @@ function showProgress(){
             }
             document.getElementById("rlist").innerHTML += '<div class="form-check" id="group_r_'+i+'" required>\
                                                             <input class="form-check-input" type="radio" name="flexRadioDefault" id="r'+i+'" onchange="setVal(this.id, this.type)" value='+header_old[i]+'>\
-                                                                <label class="form-check-label text-left" for="flexRadioDefault1" id="rlabel'+i+'" style="margin-right:100%">\
+                                                                <label class="form-check-label text-left" for="flexRadioDefault1" id="rlabel'+i+'" style="margin-right:100%;">\
                                                                 '+header_old[i]+'\
                                                                 </label>\
                                                             </div>';
@@ -354,3 +364,39 @@ function showProgress(){
             }
         }
     }
+    
+    //SweetAlert2 Firing modal
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+          confirmButton: "btn btn-success",
+          cancelButton: "btn btn-danger"
+        },
+        buttonsStyling: false
+      });
+
+      
+    function fireConfirmModal(){
+        swalWithBootstrapButtons.fire({
+            title: "Are you sure to start analysis?",
+          /*   text: "You won't be able to revert this!", */
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, start it!",
+            cancelButtonText: "No, cancel!",
+            reverseButtons: true
+          }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "/Step3";
+            } else if (
+              /* Read more about handling dismissals below */
+              result.dismiss === Swal.DismissReason.cancel
+            ) {
+              swalWithBootstrapButtons.fire({
+                title: "Analysis Cancelled",
+                text: "The analysis was cancelled successfully",
+                icon: "error"
+              });
+            }
+          });
+    }
+      
