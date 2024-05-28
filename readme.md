@@ -7,6 +7,11 @@ To use this API, you need Python 3.8 or higher. All project dependencies are lis
 ## Installation
 Follow these steps to set up the project locally.
 
+## Create Python Environment
+python -m venv env
+env\Scripts\Activate.ps1
+
+
 ### Install Dependencies
 Install the necessary Python dependencies with:
 

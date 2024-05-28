@@ -48,18 +48,22 @@
                                         <input type="button" name="next-step1" id="next-step1" class="next-step" value="Next Step" style="display: none"/>
                                         
                                     </fieldset> 
-                                    <fieldset hidden id="fieldset2" class="text-center"> 
-                                        <h1>Select features to analyze</h2> 
+                                    <fieldset hidden id="fieldset2" class="text-center">  
                                         <p>You can edit the table by right-clicking on it.<br>Refer to the 'Help' button for more information.</p>
                                         <!-- STEP 2-->
                                         
 
+                                        <button class="btn btn-primary" style="background-color: blue !important; border-color: blue" onclick="firehelpmodal()">Help</button>
+
                                             <div class="mt-5" id="grid_csv">
                                                 <div class="row">
+                                                    <div class="col"></div>
                                                     <div id="grid"></div>
+                                                    <div class="col"></div>
                                                 </div>
                                             </div>
 
+                                            
                                             <button type="button" class="btn btn-lg btn-outline-success" onclick="undo()">
                                                 <i class="fa fa-undo"></i>
                                             </button>
@@ -67,10 +71,8 @@
                                             <button type="button" class="btn btn-lg btn-outline-success" onclick="redo()">
                                                 <i class="fa fa-rotate-right" ></i>
                                             </button>
-
+    
                                       <!--       <button class="btn btn-success" onclick="sendData()">Help</button> -->
-
-                                            <button class="btn btn-success" onclick="firehelpmodal()">Help</button>
 
                                             <div class="row">
                                             
@@ -79,7 +81,6 @@
                                                 </div>
                                                  
                                             </div>
-                                             
                                             <div class="row">
                                                 
                                                <!-- <div class="col" id="cblist">
