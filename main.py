@@ -151,13 +151,13 @@ def testbootstrap(request: Request):
 def testbootstrap(request: Request):
     return templates.TemplateResponse(request, name="csv.html")
 
-@app.get("/Step3", tags=["Frontend"])
-def Step3(request: Request):
+@app.get("/chat", tags=["Frontend"])
+def chat(request: Request):
     return templates.TemplateResponse(request, name="chat.html")
 
-@app.get("/chat_alfonso", tags=["Frontend"])
+@app.get("/chat_old", tags=["Frontend"])
 def Step3(request: Request):
-    return templates.TemplateResponse(request, name="chat_alfonso.html")
+    return templates.TemplateResponse(request, name="chat_old.html")
 
 
 

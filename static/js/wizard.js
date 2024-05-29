@@ -390,7 +390,7 @@ function showProgress(){
             reverseButtons: true
           }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = "/Step3";
+                window.location.href = "/chat";
             } else if (
               /* Read more about handling dismissals below */
               result.dismiss === Swal.DismissReason.cancel
