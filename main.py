@@ -136,12 +136,12 @@ def home(request: Request):
 
 @app.get("/", tags=["Frontend"])
 def index(request: Request):
-    return templates.TemplateResponse(request, name="provahome/index.html")
+    return templates.TemplateResponse(request, name="homepage.html")
 
-@app.get("/progressbar", tags=["Frontend"])
+@app.get("/wizard", tags=["Frontend"])
 def progressbar(request: Request):
 
-    return templates.TemplateResponse(request, name="progressbar.html")
+    return templates.TemplateResponse(request, name="wizard.html")
 
 @app.get("/testbootstrap", tags=["Frontend"])
 def testbootstrap(request: Request):
@@ -153,7 +153,13 @@ def testbootstrap(request: Request):
 
 @app.get("/Step3", tags=["Frontend"])
 def Step3(request: Request):
-    return templates.TemplateResponse(request, name="Step3.html")
+    return templates.TemplateResponse(request, name="chat.html")
+
+@app.get("/chat_alfonso", tags=["Frontend"])
+def Step3(request: Request):
+    return templates.TemplateResponse(request, name="chat_alfonso.html")
+
+
 
 
 

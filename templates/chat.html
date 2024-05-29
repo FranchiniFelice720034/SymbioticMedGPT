@@ -7,7 +7,7 @@
     <link href="static/css/step3style.css" rel="stylesheet"/>
 </head>
 
-<body class="fullscreen">
+<body class="fullscreen" style="background-color: #212529;">
         <!-- <div class="sidebar collapsed">
             <div class="tooltip">
                 <span class="tooltiptext">
@@ -40,13 +40,17 @@
                 <div class="chat-header">
                    
                     <div class="logo-container">
-                        <h1>MedGPT 1.0&nbsp;</h1>
+                        <a href="/">
+                        <img src="static/images/im2/navbar-logo.svg" style="width: 150px; height: 150px"/>
+                        </a>
+
                     </div>
-    
+                    
                     <div class="mode-toggle">
-                        <label class="switch">
+                        <i class="fa-solid fa-circle-half-stroke" style="margin-right: 10px;"></i>
+                        <label class="switch" style="margin-right: 10px;">
                             <input type="checkbox" 
-                                   id="mode-toggle-checkbox">
+                                   id="mode-toggle-checkbox"> 
                             <span class="slider round"></span>
                         </label>
                     </div>
@@ -55,20 +59,15 @@
     
                 <div class="chat-box" id="chat-box"></div>
                 <div class="input-container">
-                    <input type="text" id="user-input" 
-                           placeholder="Type your message...">
+                    <input type="text" id="user-input" placeholder="Type your message...">
                     <button id="send-button">
-                      <b>&uarr;</b>
-                      </button>
+                        <img src="static/images/icons/sent_icon.svg" style="width: 30px; height: 30px"/>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-    
-
-
 </body>
 
-
-
-<script src="static/js/step3.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="static/js/chat.js"></script>

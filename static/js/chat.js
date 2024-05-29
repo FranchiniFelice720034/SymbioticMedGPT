@@ -1,5 +1,11 @@
-//Step3 MedGPT Conversation
+$(document).ready(function () { 
+    document.body.classList.toggle('dark-mode');
+    document.getElementById('nav-logo').style.display="none";
+    
+});
 
+
+//Step3 MedGPT Conversation
 const chatBox = 
     document.getElementById('chat-box');
 const userInput = 
@@ -173,3 +179,4 @@ function getRandomNumber(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 getResponse('Hello');
+

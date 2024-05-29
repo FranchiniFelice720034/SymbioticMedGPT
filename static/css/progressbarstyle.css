@@ -183,4 +183,8 @@ h2{
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
   }
+
+  body {
+    overflow-x: hidden; /* Hide horizontal scrollbar */
+  }
   
