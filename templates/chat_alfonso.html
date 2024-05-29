@@ -1,5 +1,5 @@
 {% include 'layouts/header.html' %}
-<html data-bs-theme="dark">
+<html id="theme" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,22 +9,41 @@
 </head>
 
 <body>
-    <!-- border: 1px solid #ccc; -->
+    <header>
+        <!-- Add the toggle button here -->
+        <div class="d-flex justify-content-end p-3">
+            <a onclick="toggleTheme()" id="themeToggleBtn" class="circle-anchor" style="background-color: #88b2ccda;">
+                <i id="themeIcon" class="fas fa-sun" style="color: white;"></i>
+            </a>
+        </div>
+    </header>
+
     <div id="chat-box" style="height: 70%; overflow-y: auto; padding: 10px;"></div>
 
-    <div class="container d-flex align-items-center mt-5 user_tools" style="margin-left: 15%; margin-right: 20%;">
+    <div class="container d-flex align-items-center mt-5 user_tools">
+        <a onclick="exit()" class="circle-anchor" style="margin-right: 5%; background-color: red">
+            <i class="fa-solid fa-arrow-right-from-bracket" style="color: black"></i>
+        </a>
         <input id="message" type="text" class="form-control form-rounded" style="border-radius: 2rem; display: inline-block; width: 85%;" placeholder="Type a message">
         
         <a onclick="sendUserMessage()" class="circle-anchor" style="margin-left: 1%">
             <img src="static/images/icons/sent_icon.svg" style="width: 30px; height: 30px"/>
         </a>
-        
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        //SweetAlert2 Firing modal
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+            confirmButton: "btn btn-success",
+            cancelButton: "btn btn-danger"
+            },
+            buttonsStyling: false
+        });
         document.addEventListener('DOMContentLoaded', function() {
             function scrollToBottom() {
                 console.log("Scroll to bottom function called");
@@ -35,7 +54,7 @@
 
             function sendGPT(){
                 $('#chat-box').append('<div class="row gpt_message_container">\
-                                            <p class="gpt_message">MedGPT:<br>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</p>\
+                                            <p class="gpt_message">MedGPT:<br>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</p>\
                                         </div>'); 
                 scrollToBottom();
             }
@@ -57,8 +76,59 @@
             window.sendUserMessage = sendUserMessage;
 
         });
+
+        // function to toggle between light and dark theme
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('themeIcon');
+            if(html.getAttribute('data-bs-theme') === 'light') {
+                html.setAttribute('data-bs-theme', 'dark');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            } else {
+                html.setAttribute('data-bs-theme', 'light');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+        }
+
+        function exit(){
+            swalWithBootstrapButtons.fire({
+                title: "Are you sure to quit the chat?",
+              /*   text: "You won't be able to revert this!", */
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, I'm sure!",
+                cancelButtonText: "No, bring me back!",
+                text: "If you quit, you will not be able to recover the chat!",
+                reverseButtons: true
+              }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "/";
+                }
+              });
+        }
     </script>
     <style>
+        :root {
+            --user-chat-bgcolor: #2f2f2f; /* Default Bootstrap primary color */
+            --user-chat-textcolor: #ffffff; /* Default Bootstrap secondary color */
+            --gbt-chat-bgcolor: #e4c642; /* Default Bootstrap primary color */
+            --gbt-chat-textcolor: #000000; /* Default Bootstrap secondary color */
+          }
+          
+          [data-bs-theme="dark"] {
+            --user-chat-bgcolor: #2f2f2f; /* Default Bootstrap primary color */
+            --user-chat-textcolor: #ffffff; /* Default Bootstrap secondary color */
+            --gbt-chat-bgcolor: #e4c642; /* Default Bootstrap primary color */
+            --gbt-chat-textcolor: #000000; /* Default Bootstrap secondary color */
+          }
+          [data-bs-theme="light"] {
+            --user-chat-bgcolor: #f4f4f4; /* Default Bootstrap primary color */
+            --user-chat-textcolor: #000000; /* Default Bootstrap secondary color */
+            --gbt-chat-bgcolor: #e4c642; /* Default Bootstrap primary color */
+            --gbt-chat-textcolor: #000000; /* Default Bootstrap secondary color */
+          }
         #chat-box{
             overflow-x: hidden;
         }
@@ -73,10 +143,12 @@
             text-decoration: none; /* Remove underline from the anchor */
         }
         .user_message {
+            color: var(--user-chat-textcolor);
             margin: 10px;
         }
         .gpt_message {
-            justify-content: right;
+            color: var(--gbt-chat-textcolor);
+            margin: 10px;
         }
         .user_message_container {
             float: right;
@@ -85,7 +157,7 @@
             margin-bottom: 4%;
             margin-right: 2%;
             display: inline-block;
-            background-color: #2f2f2f;
+            background-color: var(--user-chat-bgcolor);
             max-width: 35%;
             height: auto;
             word-wrap: break-word;
@@ -97,15 +169,18 @@
             margin-bottom: 4%;
             margin-right: 65%;
             display: inline-block;
-            background-color: #2a2702;
+            background-color: var(--gbt-chat-bgcolor);
             max-width: 35%;
             height: auto;
             word-wrap: break-word;
         }
         .user_tools {
+            padding-top: 1%;
             position: fixed;
-            bottom: 20px;
+            bottom: 10px;
             width: 100%;
+            margin-left: 10%; 
+            margin-right: 20%;
         }
     </style>
 </body>
