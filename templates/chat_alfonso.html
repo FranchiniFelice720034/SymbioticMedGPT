@@ -9,65 +9,104 @@
 </head>
 
 <body>
-    <div class="container" id="chat-box">
-        
-    
-    </div>
+    <!-- border: 1px solid #ccc; -->
+    <div id="chat-box" style="height: 70%; overflow-y: auto; padding: 10px;"></div>
 
-    <div class="container d-flex align-items-center mt-5 user_tools">
-        <input id="message" type="text" class="form-control form-rounded" style="border-radius: 2rem; display: inline-block; width: 85%; margin-left: 20%;" placeholder="Type a message">
+    <div class="container d-flex align-items-center mt-5 user_tools" style="margin-left: 15%; margin-right: 20%;">
+        <input id="message" type="text" class="form-control form-rounded" style="border-radius: 2rem; display: inline-block; width: 85%;" placeholder="Type a message">
+        
         <a onclick="sendUserMessage()" class="circle-anchor" style="margin-left: 1%">
             <img src="static/images/icons/sent_icon.svg" style="width: 30px; height: 30px"/>
         </a>
-        <a onclick="sendGPT()" class="circle-anchor" style="margin-left: 1%; background-color: green;">
-            <img src="static/images/icons/sent_icon.svg" style="width: 30px; height: 30px"/>
-        </a>
+        
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function scrollToBottom() {
+                console.log("Scroll to bottom function called");
+                var chatBox = document.getElementById('chat-box');
+                console.log("Chat box height:", chatBox.scrollHeight);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+
+            function sendGPT(){
+                $('#chat-box').append('<div class="row gpt_message_container">\
+                                            <p class="gpt_message">MedGPT:<br>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</p>\
+                                        </div>'); 
+                scrollToBottom();
+            }
+            
+            function sendUserMessage(){
+                var message = document.getElementById("message").value;
+                if(message){
+                    $('#chat-box').append('<div class="row user_message_container">\
+                                                <p class="user_message">User:<br>'+message+'</p>\
+                                            </div>'); 
+                    document.getElementById("message").value = '';
+                    scrollToBottom();
+                    sendGPT();
+                }
+            }
+
+            // Ensure functions are globally accessible
+            window.sendGPT = sendGPT;
+            window.sendUserMessage = sendUserMessage;
+
+        });
+    </script>
+    <style>
+        #chat-box{
+            overflow-x: hidden;
+        }
+        .circle-anchor {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 40px; /* Set the width of the circle */
+            height: 40px; /* Set the height of the circle */
+            background-color: #ffc800; /* Background color of the circle */
+            border-radius: 50%; /* Makes the anchor a circle */
+            text-decoration: none; /* Remove underline from the anchor */
+        }
+        .user_message {
+            margin: 10px;
+        }
+        .gpt_message {
+            justify-content: right;
+        }
+        .user_message_container {
+            float: right;
+            border-radius: 2rem;
+            margin-left: 65%;
+            margin-bottom: 4%;
+            margin-right: 2%;
+            display: inline-block;
+            background-color: #2f2f2f;
+            max-width: 35%;
+            height: auto;
+            word-wrap: break-word;
+        }
+        .gpt_message_container{
+            float: left;
+            border-radius: 2rem;
+            margin-left: 2%;
+            margin-bottom: 4%;
+            margin-right: 65%;
+            display: inline-block;
+            background-color: #2a2702;
+            max-width: 35%;
+            height: auto;
+            word-wrap: break-word;
+        }
+        .user_tools {
+            position: fixed;
+            bottom: 20px;
+            width: 100%;
+        }
+    </style>
 </body>
-
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-<script>
-    function sendGPT(){
-        $('#chat-box').append('<p class="gpt_message">Ciao, sono Medgpt!</p>'); 
-    }
-
-    function sendUserMessage(){
-        message = document.getElementById("message").value;
-        $('#chat-box').append('<div class="row user_message_container">\
-                                    <p class="user_message">'+message+'</p>\
-                                </div><br>'); 
-        document.getElementById("message").value = null;
-    }
-</script>
-<style>
-    .circle-anchor {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 40px; /* Set the width of the circle */
-        height: 40px; /* Set the height of the circle */
-        background-color: #ffc800; /* Background color of the circle */
-        border-radius: 50%; /* Makes the anchor a circle */
-        text-decoration: none; /* Remove underline from the anchor */
-    }
-    .user_message{
-        justify-content: left;
-    
-    }
-    .gpt_message{
-        justify-content: right;
-    }
-    .user_message_container{
-        width: 50%;
-        background-color: #2f2f2f;
-        border-radius: 2rem;
-        float: right;
-    }
-    .user_tools{
-        position: fixed;
-        bottom: 20px;
-        width: 100%;
-    }
-</style>
+</html>
