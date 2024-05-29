@@ -1,0 +1,72 @@
+:root {
+    --user-chat-bgcolor: #2f2f2f; /* Default Bootstrap primary color */
+    --user-chat-textcolor: #ffffff; /* Default Bootstrap secondary color */
+    --gbt-chat-bgcolor: #e4c642; /* Default Bootstrap primary color */
+    --gbt-chat-textcolor: #000000; /* Default Bootstrap secondary color */
+  }
+  
+  [data-bs-theme="dark"] {
+    --user-chat-bgcolor: #2f2f2f; /* Default Bootstrap primary color */
+    --user-chat-textcolor: #ffffff; /* Default Bootstrap secondary color */
+    --gbt-chat-bgcolor: #e4c642; /* Default Bootstrap primary color */
+    --gbt-chat-textcolor: #000000; /* Default Bootstrap secondary color */
+  }
+  [data-bs-theme="light"] {
+    --user-chat-bgcolor: #f4f4f4; /* Default Bootstrap primary color */
+    --user-chat-textcolor: #000000; /* Default Bootstrap secondary color */
+    --gbt-chat-bgcolor: #e4c642; /* Default Bootstrap primary color */
+    --gbt-chat-textcolor: #000000; /* Default Bootstrap secondary color */
+  }
+#chat-box{
+    overflow-x: hidden;
+}
+.circle-anchor {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px; /* Set the width of the circle */
+    height: 40px; /* Set the height of the circle */
+    background-color: #ffc800; /* Background color of the circle */
+    border-radius: 50%; /* Makes the anchor a circle */
+    text-decoration: none; /* Remove underline from the anchor */
+}
+.user_message {
+    color: var(--user-chat-textcolor);
+    margin: 10px;
+}
+.gpt_message {
+    color: var(--gbt-chat-textcolor);
+    margin: 10px;
+}
+.user_message_container {
+    float: right;
+    border-radius: 2rem;
+    margin-left: 65%;
+    margin-bottom: 4%;
+    margin-right: 2%;
+    display: inline-block;
+    background-color: var(--user-chat-bgcolor);
+    max-width: 35%;
+    height: auto;
+    word-wrap: break-word;
+}
+.gpt_message_container{
+    float: left;
+    border-radius: 2rem;
+    margin-left: 2%;
+    margin-bottom: 4%;
+    margin-right: 65%;
+    display: inline-block;
+    background-color: var(--gbt-chat-bgcolor);
+    max-width: 65%;
+    height: auto;
+    word-wrap: break-word;
+}
+.user_tools {
+    padding-top: 1%;
+    position: fixed;
+    bottom: 10px;
+    width: 100%;
+    margin-left: 10%; 
+    margin-right: 20%;
+}
