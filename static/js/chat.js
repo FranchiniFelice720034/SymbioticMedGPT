@@ -14,9 +14,9 @@ document.addEventListener('DOMContentLoaded', function() {
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    function sendGPT(){
+    function sendGPT(message){
         $('#chat-box').append('<div class="row gpt_message_container">\
-                                    <p class="gpt_message">MedGPT:<br>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</p>\
+                                    <p class="gpt_message">MedGPT:<br>'+message+'</p>\
                                 </div>'); 
         scrollToBottom();
     }
@@ -29,13 +29,15 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </div>'); 
             document.getElementById("message").value = '';
             scrollToBottom();
-            sendGPT();
+            sendGPT('Ok, fammi pensare.');
         }
     }
 
     // Ensure functions are globally accessible
     window.sendGPT = sendGPT;
     window.sendUserMessage = sendUserMessage;
+    sendGPT('Benvenuto! A breve ti fornirò una descrizione dettagliata del file che mi hai inviato!');
+
 
 });
 
