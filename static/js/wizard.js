@@ -408,7 +408,7 @@ function showProgress(){
     function firehelpmodal(){
         
         swalWithBootstrapButtons.fire({
-            html: 'You can cut, sort, delete columns and rows by <br> left-clicking on them.<br>You can edit the text inside the cells by <br> double-clicking on them.',
+            html: 'You can cut, sort, delete columns and rows by <br> right-clicking on them.<br>You can edit the text inside the cells by <br> double-left-clicking on them.',
             imageUrl: "https://raw.githubusercontent.com/DataGridXL/DataGridXL1/master/images/javascript-spreadsheet.png",
             imageWidth: 800,
             imageHeight: 400
