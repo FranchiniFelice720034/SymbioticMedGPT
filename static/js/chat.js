@@ -1,3 +1,8 @@
+const socket = io("http://localhost:8000/");
+socket.on('send_msg',(data)=>{
+    console.log(data);
+} );
+//socket.emit('msg', 'a');
  //SweetAlert2 Firing modal
  const swalWithBootstrapButtons = Swal.mixin({
     customClass: {

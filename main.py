@@ -15,10 +15,11 @@ from pydantic import BaseModel
 import os
 import datetime
 import time
-import json 
+from env import MODEL_PATH 
 import random
+import socketio
 
-model_path="./llms/mistral-7b-v0.1.Q2_K.gguf"
+model_path=MODEL_PATH
 csv_uploaded_path="csv/uploaded/"
 
 origins = [
@@ -192,3 +193,19 @@ async def get_body(request: Request):
     ts = datetime.datetime.fromtimestamp(ts).strftime('%d-%m-%Y-%H-%M-%S')
     print(df)
     df.to_csv('csv/uploaded/csv_'+str(ts)+'.csv', index=False, encoding='utf-8')
+
+#Socket
+sio=socketio.AsyncServer(cors_allowed_origins='*',async_mode='asgi')
+#wrap with ASGI application
+socket_app = socketio.ASGIApp(sio)
+app.mount("/", socket_app)
+@sio.on("connect")
+async def connect(sid, env):
+    print("New Client Connected to This id :"+" "+str(sid))
+    await sio.emit("send_msg", "Hello from Server")
+@sio.on('msg')
+async def client_side_receive_msg(sid, msg):
+    print("Msg receive from " +str(sid) +"and msg is : ",str(msg))
+@sio.on("disconnect")
+async def disconnect(sid):
+    print("Client Disconnected: "+" "+str(sid))

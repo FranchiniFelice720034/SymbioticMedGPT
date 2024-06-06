@@ -163,3 +163,4 @@ cython_debug/
 llms/
 flipkart2ean5.csv
 csv/uploaded/*
+env.py
