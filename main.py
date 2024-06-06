@@ -18,6 +18,7 @@ import time
 from env import MODEL_PATH 
 import random
 import socketio
+import re
 
 model_path=MODEL_PATH
 csv_uploaded_path="csv/uploaded/"
@@ -84,17 +85,11 @@ def _execute_model(request: Request, query: str):
     result = request.app.state.csv_agent.invoke(query)
     return result['output']
 
-@app.post("/start-model-and-get-first-review", tags=["Use Model"])
-async def _start_model_get_first_review(file: UploadFile = File(...), dep_var: str = Form(...)):
 
-    if not file:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File required")
-    if not dep_var:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="dep_var required")
-    if file.content_type != 'text/csv':
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File format is not csv")
-    
-    df = pd.read_csv(file.file)
+async def _start_model_get_first_review(dataframe, dep_var):
+
+    print("AAAA")
+    df = dataframe
 
     if dep_var not in df.columns:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid dep_var value")
@@ -118,7 +113,7 @@ async def _start_model_get_first_review(file: UploadFile = File(...), dep_var: s
                                         After doing the classification write me an argued reply where \
                                         you say that the features you found through your classification \
                                         tool as most important are the 5 that the tool gave you as output')
-    return result['output']
+    await sio.emit(result['output'])
 
 templates = Jinja2Templates(directory="templates")
 
@@ -181,6 +176,7 @@ class ObjectListItem(BaseModel):
 async def get_body(request: Request):
     data = await request.json()
     df = pd.json_normalize(data['table'])
+    dep_var = data['dep_var']
     header = df.loc[0, :].values.tolist()
     df = df.iloc[1: ]
     
@@ -192,7 +188,14 @@ async def get_body(request: Request):
     ts = time.time()
     ts = datetime.datetime.fromtimestamp(ts).strftime('%d-%m-%Y-%H-%M-%S')
     print(df)
+
+    d = '&nbsp'
+    if d in dep_var:
+        dep_var = dep_var.replace(d, ' ')    
+    
+    print(dep_var)
     df.to_csv('csv/uploaded/csv_'+str(ts)+'.csv', index=False, encoding='utf-8')
+    await _start_model_get_first_review(df, dep_var)
 
 #Socket
 sio=socketio.AsyncServer(cors_allowed_origins='*',async_mode='asgi')

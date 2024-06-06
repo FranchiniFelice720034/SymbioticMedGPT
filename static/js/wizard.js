@@ -227,6 +227,7 @@ function showProgress(){
         var dep_var = null;
         for(i = 0; i<header_old.length; i++){
             var radio_v = document.getElementById('r'+i);
+            console.log(radio_v.value);
             if(radio_v.checked){
                 dep_var = radio_v.value;
                 break;
@@ -237,12 +238,11 @@ function showProgress(){
 
     function sendData(){
         csv_data = grid.getData();
-        var ind_var = getIndepVars();
         var dep_var = getDepVars();
         $.ajax({ 
             type: "POST",
             url: url+'senddata',
-            data: JSON.stringify({"table": csv_data, "indep_var": ind_var, "dep_var": dep_var}),
+            data: JSON.stringify({"table": csv_data, "dep_var": dep_var}),
             success: function(data){        
                 console.log(data);
             },
