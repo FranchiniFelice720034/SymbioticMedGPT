@@ -116,20 +116,11 @@ def _execute_model(request: Request, query: str):
     return result['output']
 
 
-async def _start_model_get_first_review(dataframe, dep_var):
+async def _start_model_get_first_review(df, dep_var):
     print("Chiamato start-model-and-get-first-review")
-    if not dep_var:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="dep_var required")
-
-    print("AAAA")
-    df = dataframe
-
-    if dep_var not in df.columns:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid dep_var value")
     
     app.state.df = df
     app.state.dep_var = dep_var
-
 
     app.state.csv_agent = create_pandas_dataframe_agent(
         app.state.llm, df, include_df_in_prompt = True, 
@@ -144,7 +135,9 @@ async def _start_model_get_first_review(dataframe, dep_var):
     result = app.state.csv_agent.invoke(f"Perform a classification on the dataframe with the dependent variable '{dep_var}'. \
                                         Use the Feature Importance Classifier tool to identify the top 5 most important features. \
                                         Provide a detailed response listing these features and explain that they were identified using the classification tool. \
-                                        Ask me whatever you want me to do on the .csv file. For example, you can ask me to drop some columns from the .csv and restart the classification to determine the top 5 most important features.")
+                                        Ask me whatever you want me to do on the .csv file. For example, you can ask me to drop some columns from the .csv and \
+                                        restart the classification to determine the top 5 most important features.")
+    
     await sio.emit(result['output'])
 
 @app.post("/debug-custom_classification_tool", tags=["Debug"])
