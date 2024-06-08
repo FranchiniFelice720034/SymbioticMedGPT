@@ -1,3 +1,5 @@
+const zoom = mediumZoom({ margin: 48, background: "#2626276f" });
+var img_count = 0;
 const socket = io("http://localhost:8000/");
 socket.on('send_msg',(data)=>{
     console.log(data);
@@ -11,7 +13,10 @@ socket.on('send_msg',(data)=>{
     },
     buttonsStyling: false
 });
+const zoomMargin = mediumZoom('#zoom-margin', { margin: 48 });
+
 document.addEventListener('DOMContentLoaded', function() {
+
     function scrollToBottom() {
         console.log("Scroll to bottom function called");
         var chatBox = document.getElementById('chat-box');
@@ -19,9 +24,24 @@ document.addEventListener('DOMContentLoaded', function() {
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
+    function attachGPTImage(img_name){
+        //onclick="this.requestFullscreen()"
+        path = 'static/images/model_images/'+img_name;
+        $('#chat-box').append('<div class="row">\
+                                    <div class="gpt_image_container">\
+                                        <img id="gpt_img_'+img_count+'"class="gtp_image" src='+path+'/>\
+                                    </div>\
+                                </div>'); 
+        scrollToBottom();
+        zoom.attach('#gpt_img_'+img_count+'');
+        img_count++;
+    }
+
     function sendGPT(message){
-        $('#chat-box').append('<div class="row gpt_message_container">\
-                                    <p class="gpt_message">MedGPT:<br>'+message+'</p>\
+        $('#chat-box').append('<div class="row">\
+                                    <div class="gpt_message_container">\
+                                        <p class="gpt_message">MedGPT:<br>'+message+'</p>\
+                                    </div>\
                                 </div>'); 
         scrollToBottom();
     }
@@ -29,8 +49,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function sendUserMessage(){
         var message = document.getElementById("message").value;
         if(message){
-            $('#chat-box').append('<div class="row user_message_container">\
-                                        <p class="user_message">User:<br>'+message+'</p>\
+            $('#chat-box').append('<div class="row">\
+                                        <div class="user_message_container">\
+                                            <p class="user_message">User:<br>'+message+'</p>\
+                                        </div>\
                                     </div>'); 
             document.getElementById("message").value = '';
             scrollToBottom();
@@ -41,6 +63,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Ensure functions are globally accessible
     window.sendGPT = sendGPT;
     window.sendUserMessage = sendUserMessage;
+    window.attachGPTImage = attachGPTImage;
+
     sendGPT('Benvenuto! A breve ti fornirò una descrizione dettagliata del file che mi hai inviato!');
 
 

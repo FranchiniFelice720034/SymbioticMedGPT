@@ -154,6 +154,10 @@ def chat(request: Request):
 @app.get("/chat_old", tags=["Frontend"])
 def Step3(request: Request):
     return templates.TemplateResponse(request, name="chat_old.html")
+@app.get("/test", tags=["Frontend"])
+def test(request: Request):
+    return templates.TemplateResponse(request, name="test.html")
+
 
 
 
