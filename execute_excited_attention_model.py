@@ -14,10 +14,6 @@ from sklearn.model_selection import train_test_split
 import seaborn as sns
 import random
 from tqdm import tqdm
-import requests
-import gzip
-import shutil
-import warnings
 from sklearn.metrics import accuracy_score, f1_score
 
 os.environ['PYTHONHASHSEED'] = '0'
