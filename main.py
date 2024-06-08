@@ -3,7 +3,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, File, UploadFile, Request, Form, HTTPException, status
 from fastapi.responses import JSONResponse
 from langchain_community.llms import LlamaCpp
+from langchain_openai import OpenAI
 from langchain.memory import ConversationBufferWindowMemory
+from langchain_core.callbacks import CallbackManager, StreamingStdOutCallbackHandler
 from langchain_experimental.agents import create_pandas_dataframe_agent
 from langchain.tools import Tool
 from fastapi.templating import Jinja2Templates #frontend library
@@ -19,6 +21,8 @@ from env import MODEL_PATH
 import random
 import socketio
 import re
+
+from execute_excited_attention_model import get_important_features_and_correlated_features
 
 model_path=MODEL_PATH
 csv_uploaded_path="csv/uploaded/"
@@ -46,21 +50,46 @@ chat_history_buffer = ConversationBufferWindowMemory(
     input_key="input"
 )
 
-def perform_classification_fn(input:str) -> list[str]:
-    columns = app.state.df.columns.tolist()
-    random_columns = random.sample(columns, k=5)
-    return random_columns
+def perform_classification_fn(*args, **kwargs) -> dict[str, list[tuple]]:
+    # Perform the classification
+    result = get_important_features_and_correlated_features(app.state.df, app.state.dep_var)
+    return result
 custom_classification_tool = Tool.from_function(
     func=perform_classification_fn,
-    name="Classification with a dependent variable",
-    description="Useful for when you are asked to perform a classification task on a pandas dataframe with \
-        a dependent variable, you need to give to the tool in input the name of the dependent variable and \
-        the tool will return the name of the firsts 5 most useful features to perform the classification.",
+    #return_direct=True,
+    name="Feature Importance Classifier",
+    description="Use this tool to identify the top 5 most important features for classification given a dependent variable. \
+        The tool will return a list of the top 5 most important features."
+)
+
+def drop_columns_fn(*args, **kwargs) -> list[str]:
+    if args:
+        columns_to_drop = args[0]
+    else:
+        columns_to_drop = []
+    app.state.df.drop(columns=columns_to_drop, inplace=True)
+    remaining_columns = app.state.df.columns.tolist()
+    return remaining_columns
+custom_drop_columns_tool = Tool.from_function(
+    func=drop_columns_fn,
+    name="Column Dropper",
+    description="Use this tool to drop specified columns from a pandas dataframe. Provide a list of the column names to drop, \
+        and the tool will return the names of the remaining columns in the dataframe."
 )
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.llm = LlamaCpp(model_path=model_path, n_gpu_layers=-1, temperature=0, max_tokens=4096, n_ctx=4096)
+    callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
+    app.state.llm = LlamaCpp(
+        model_path=model_path,
+        n_gpu_layers=-1, 
+        temperature=0.1, 
+        max_tokens=4096, 
+        n_ctx=4096,
+        top_p=1,
+        callback_manager=callback_manager,
+        verbose=True,
+    )
     yield
 
 app = FastAPI(
@@ -79,6 +108,7 @@ app.add_middleware(
 
 @app.get("/execute", tags=["Use Model"])
 def _execute_model(request: Request, query: str):
+    print("Chiamato execute")
     if not hasattr(request.app.state, 'csv_agent'):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Model not loaded")
 
@@ -87,6 +117,9 @@ def _execute_model(request: Request, query: str):
 
 
 async def _start_model_get_first_review(dataframe, dep_var):
+    print("Chiamato start-model-and-get-first-review")
+    if not dep_var:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="dep_var required")
 
     print("AAAA")
     df = dataframe
@@ -108,12 +141,24 @@ async def _start_model_get_first_review(dataframe, dep_var):
             "memory": chat_history_buffer
         }
     )
-    result = app.state.csv_agent.invoke(f'Perform a classification on a pandas dataframe with a \
-                                        dependent variable, the dependent variable is called {dep_var}. \
-                                        After doing the classification write me an argued reply where \
-                                        you say that the features you found through your classification \
-                                        tool as most important are the 5 that the tool gave you as output')
+    result = app.state.csv_agent.invoke(f"Perform a classification on the dataframe with the dependent variable '{dep_var}'. \
+                                        Use the Feature Importance Classifier tool to identify the top 5 most important features. \
+                                        Provide a detailed response listing these features and explain that they were identified using the classification tool. \
+                                        Ask me whatever you want me to do on the .csv file. For example, you can ask me to drop some columns from the .csv and restart the classification to determine the top 5 most important features.")
     await sio.emit(result['output'])
+
+@app.post("/debug-custom_classification_tool", tags=["Debug"])
+async def _debug_custom_classification_tool(file: UploadFile = File(...), dep_var: str = Form(...)):
+    df = pd.read_csv(file.file)
+    app.state.df = df
+    app.state.dep_var = dep_var
+    result = perform_classification_fn(dep_var)
+    return str(result)
+
+@app.post("/debug-custom_drop_columns_tool", tags=["Debug"])
+async def _debug_custom_drop_columns_tool(columns_to_drop: str = Form(...)):
+    result = drop_columns_fn(columns_to_drop)
+    return str(result)
 
 templates = Jinja2Templates(directory="templates")
 
