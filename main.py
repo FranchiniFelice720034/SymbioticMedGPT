@@ -57,9 +57,12 @@ def perform_classification_fn(*args, **kwargs) -> dict[str, list[tuple]]:
 custom_classification_tool = Tool.from_function(
     func=perform_classification_fn,
     #return_direct=True,
-    name="Feature Importance Classifier",
-    description="Use this tool to identify the top 5 most important features for classification given a dependent variable. \
-        The tool will return a list of the top 5 most important features."
+    name="Feature Importance and Correlation Classifier",
+    description="Use this tool to identify the top 5 most important features for classification given a dependent variable, \
+        along with their importance scores, and the top 5 feature correlations. \
+        The tool will return a dictionary with two keys: 'top_5_features' and 'top_5_correlations'. \
+        'top_5_features' will be a list of tuples, where each tuple contains a feature name and its importance score. \
+        'top_5_correlations' will be a list of tuples, where each tuple contains two feature names and their correlation score."
 )
 
 def drop_columns_fn(*args, **kwargs) -> list[str]:
@@ -133,10 +136,10 @@ async def _start_model_get_first_review(df, dep_var):
         }
     )
     result = app.state.csv_agent.invoke(f"Perform a classification on the dataframe with the dependent variable '{dep_var}'. \
-                                        Use the Feature Importance Classifier tool to identify the top 5 most important features. \
-                                        Provide a detailed response listing these features and explain that they were identified using the classification tool. \
-                                        Ask me whatever you want me to do on the .csv file. For example, you can ask me to drop some columns from the .csv and \
-                                        restart the classification to determine the top 5 most important features.")
+                                        Use the Feature Importance and Correlation Classifier tool to identify the top 5 most important features and the top 5 most correlated features. \
+                                        Provide a detailed response listing these features and correlations, explaining that they were identified using the classification tool. \
+                                        Provide a numbered list for both the top 5 most important features and their importance scores, and the top 5 most correlated features along with their correlation scores. \
+                                        end the response saying someting like: Ask me whatever you want me to do on the .csv file. For example, you can ask me to drop some columns from the .csv and restart the classification to determine the top 5 most important features and correlations.")
     
     await sio.emit(result['output'])
 
@@ -216,6 +219,8 @@ class ObjectListItem(BaseModel):
 
 @app.post("/senddata", tags=["Frontend"])
 async def get_body(request: Request):
+
+    print("\n\n\nChiamato senddata\n\n\n")
     data = await request.json()
     df = pd.json_normalize(data['table'])
     dep_var = data['dep_var']
