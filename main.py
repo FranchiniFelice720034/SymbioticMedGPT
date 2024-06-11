@@ -128,7 +128,7 @@ async def _start_model_get_first_review(df, dep_var):
     app.state.csv_agent = create_pandas_dataframe_agent(
         app.state.llm, df, include_df_in_prompt = True, 
         prefix=PREFIX, verbose=True,
-        extra_tools=[custom_classification_tool],
+        extra_tools=[custom_classification_tool, custom_drop_columns_tool],
         agent_executor_kwargs={
             "handle_parsing_errors": True,
             "input_variables":['df_head', 'input', 'agent_scratchpad', 'chat_history_buffer'],
@@ -137,6 +137,7 @@ async def _start_model_get_first_review(df, dep_var):
     )
     result = app.state.csv_agent.invoke(f"Perform a classification on the dataframe with the dependent variable '{dep_var}'. \
                                         Use the Feature Importance and Correlation Classifier tool to identify the top 5 most important features and the top 5 most correlated features. \
+                                        You action must be \"Feature Importance and Correlation Classifier\", and the input must be \"df, target='target'\" \
                                         Provide a detailed response listing these features and correlations, explaining that they were identified using the classification tool. \
                                         Provide a numbered list for both the top 5 most important features and their importance scores, and the top 5 most correlated features along with their correlation scores. \
                                         end the response saying someting like: Ask me whatever you want me to do on the .csv file. For example, you can ask me to drop some columns from the .csv and restart the classification to determine the top 5 most important features and correlations.")
