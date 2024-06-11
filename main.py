@@ -21,6 +21,7 @@ from env import MODEL_PATH
 import random
 import socketio
 import re
+import ast
 
 from execute_excited_attention_model import get_important_features_and_correlated_features
 
@@ -67,9 +68,20 @@ custom_classification_tool = Tool.from_function(
 
 def drop_columns_fn(*args, **kwargs) -> list[str]:
     if args:
-        columns_to_drop = args[0]
+        if isinstance(args[0], pd.DataFrame) or (isinstance(args[0], str) and "[" not in args[0]):
+            columns_to_drop = args[1] if len(args) > 1 else []
+        else:
+            columns_to_drop = args[0]
+
+        if isinstance(columns_to_drop, str):
+            columns_to_drop = columns_to_drop.replace(' ', '').replace('[', '').replace(']', '').replace("'", '').replace('"', '').replace("\\", '')
+            print(columns_to_drop)
+            columns_to_drop = columns_to_drop.split(',')
+        if not isinstance(columns_to_drop, list):
+            raise TypeError("Expected a list or a string representation of a list.")
     else:
         columns_to_drop = []
+
     app.state.df.drop(columns=columns_to_drop, inplace=True)
     remaining_columns = app.state.df.columns.tolist()
     return remaining_columns
@@ -86,7 +98,7 @@ async def lifespan(app: FastAPI):
     app.state.llm = LlamaCpp(
         model_path=model_path,
         n_gpu_layers=-1, 
-        temperature=0.1, 
+        temperature=0.1,
         max_tokens=4096, 
         n_ctx=4096,
         top_p=1,
@@ -115,6 +127,23 @@ def _execute_model(request: Request, query: str):
     if not hasattr(request.app.state, 'csv_agent'):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Model not loaded")
 
+    if "classification" in query.lower():
+        idx = query.lower().index("classification")
+        query = (
+            query[:idx + len("classification")] +
+            ". \
+            Use the Feature Importance and Correlation Classifier tool to identify the top 5 most important features and the top 5 most correlated features. \
+            Your action must be \"Feature Importance and Correlation Classifier\", and the input must be \"df, target='target'\"" +
+            query[idx + len("classification"):]
+        )
+
+        query += " Provide a detailed response listing these features and correlations, explaining that they were identified using the classification tool. " \
+                 "Provide a numbered list for both the top 5 most important features and their importance scores, and the top 5 most correlated features along with their correlation scores. " \
+                 "End the response saying something like: Ask me whatever you want me to do on the .csv file. For example, you can ask me to drop some columns from the .csv and restart the classification to determine the top 5 most important features and correlations."
+
+    print("-----------------------")
+    print("Query: ", query)
+    print("-----------------------")
     result = request.app.state.csv_agent.invoke(query)
     return result['output']
 
@@ -135,12 +164,16 @@ async def _start_model_get_first_review(df, dep_var):
             "memory": chat_history_buffer
         }
     )
-    result = app.state.csv_agent.invoke(f"Perform a classification on the dataframe with the dependent variable '{dep_var}'. \
-                                        Use the Feature Importance and Correlation Classifier tool to identify the top 5 most important features and the top 5 most correlated features. \
-                                        You action must be \"Feature Importance and Correlation Classifier\", and the input must be \"df, target='target'\" \
-                                        Provide a detailed response listing these features and correlations, explaining that they were identified using the classification tool. \
-                                        Provide a numbered list for both the top 5 most important features and their importance scores, and the top 5 most correlated features along with their correlation scores. \
-                                        end the response saying someting like: Ask me whatever you want me to do on the .csv file. For example, you can ask me to drop some columns from the .csv and restart the classification to determine the top 5 most important features and correlations.")
+    query = f"Perform a classification on the dataframe with the dependent variable '{dep_var}'. \
+            Use the Feature Importance and Correlation Classifier tool to identify the top 5 most important features and the top 5 most correlated features. \
+            Your action must be \"Feature Importance and Correlation Classifier\", and the input must be \"df, target='target'\" \
+            Provide a detailed response listing these features and correlations, explaining that they were identified using the classification tool. \
+            Provide a numbered list for both the top 5 most important features and their importance scores, and the top 5 most correlated features along with their correlation scores. \
+            end the response saying someting like: Ask me whatever you want me to do on the .csv file. For example, you can ask me to drop some columns from the .csv and restart the classification to determine the top 5 most important features and correlations."
+    print("-----------------------")
+    print("Query: ", query)
+    print("-----------------------")
+    result = app.state.csv_agent.invoke(query)
     
     await sio.emit(result['output'])
 
