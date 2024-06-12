@@ -21,6 +21,7 @@ from env import MODEL_PATH
 import random
 import socketio
 import re
+import ast
 
 from execute_excited_attention_model import get_important_features_and_correlated_features
 
@@ -57,16 +58,30 @@ def perform_classification_fn(*args, **kwargs) -> dict[str, list[tuple]]:
 custom_classification_tool = Tool.from_function(
     func=perform_classification_fn,
     #return_direct=True,
-    name="Feature Importance Classifier",
-    description="Use this tool to identify the top 5 most important features for classification given a dependent variable. \
-        The tool will return a list of the top 5 most important features."
+    name="Feature Importance and Correlation Classifier",
+    description="Use this tool to identify the top 5 most important features for classification given a dependent variable, \
+        along with their importance scores, and the top 5 feature correlations. \
+        The tool will return a dictionary with two keys: 'top_5_features' and 'top_5_correlations'. \
+        'top_5_features' will be a list of tuples, where each tuple contains a feature name and its importance score. \
+        'top_5_correlations' will be a list of tuples, where each tuple contains two feature names and their correlation score."
 )
 
 def drop_columns_fn(*args, **kwargs) -> list[str]:
     if args:
-        columns_to_drop = args[0]
+        if isinstance(args[0], pd.DataFrame) or (isinstance(args[0], str) and "[" not in args[0]):
+            columns_to_drop = args[1] if len(args) > 1 else []
+        else:
+            columns_to_drop = args[0]
+
+        if isinstance(columns_to_drop, str):
+            columns_to_drop = columns_to_drop.replace(' ', '').replace('[', '').replace(']', '').replace("'", '').replace('"', '').replace("\\", '')
+            print(columns_to_drop)
+            columns_to_drop = columns_to_drop.split(',')
+        if not isinstance(columns_to_drop, list):
+            raise TypeError("Expected a list or a string representation of a list.")
     else:
         columns_to_drop = []
+
     app.state.df.drop(columns=columns_to_drop, inplace=True)
     remaining_columns = app.state.df.columns.tolist()
     return remaining_columns
@@ -83,7 +98,7 @@ async def lifespan(app: FastAPI):
     app.state.llm = LlamaCpp(
         model_path=model_path,
         n_gpu_layers=-1, 
-        temperature=0.1, 
+        temperature=0.1,
         max_tokens=4096, 
         n_ctx=4096,
         top_p=1,
@@ -112,6 +127,23 @@ def _execute_model(request: Request, query: str):
     if not hasattr(request.app.state, 'csv_agent'):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Model not loaded")
 
+    if "classification" in query.lower():
+        idx = query.lower().index("classification")
+        query = (
+            query[:idx + len("classification")] +
+            ". \
+            Use the Feature Importance and Correlation Classifier tool to identify the top 5 most important features and the top 5 most correlated features. \
+            Your action must be \"Feature Importance and Correlation Classifier\", and the input must be \"df, target='target'\"" +
+            query[idx + len("classification"):]
+        )
+
+        query += " Provide a detailed response listing these features and correlations, explaining that they were identified using the classification tool. " \
+                 "Provide a numbered list for both the top 5 most important features and their importance scores, and the top 5 most correlated features along with their correlation scores. " \
+                 "End the response saying something like: Ask me whatever you want me to do on the .csv file. For example, you can ask me to drop some columns from the .csv and restart the classification to determine the top 5 most important features and correlations."
+
+    print("-----------------------")
+    print("Query: ", query)
+    print("-----------------------")
     result = request.app.state.csv_agent.invoke(query)
     return result['output'] """
 
@@ -137,18 +169,23 @@ async def _start_model_get_first_review(df, dep_var):
     app.state.csv_agent = create_pandas_dataframe_agent(
         app.state.llm, df, include_df_in_prompt = True, 
         prefix=PREFIX, verbose=True,
-        extra_tools=[custom_classification_tool],
+        extra_tools=[custom_classification_tool, custom_drop_columns_tool],
         agent_executor_kwargs={
             "handle_parsing_errors": True,
             "input_variables":['df_head', 'input', 'agent_scratchpad', 'chat_history_buffer'],
             "memory": chat_history_buffer
         }
     )
-    result = app.state.csv_agent.invoke(f"Perform a classification on the dataframe with the dependent variable '{dep_var}'. \
-                                        Use the Feature Importance Classifier tool to identify the top 5 most important features. \
-                                        Provide a detailed response listing these features and explain that they were identified using the classification tool. \
-                                        Ask me whatever you want me to do on the .csv file. For example, you can ask me to drop some columns from the .csv and \
-                                        restart the classification to determine the top 5 most important features.") """
+    query = f"Perform a classification on the dataframe with the dependent variable '{dep_var}'. \
+            Use the Feature Importance and Correlation Classifier tool to identify the top 5 most important features and the top 5 most correlated features. \
+            Your action must be \"Feature Importance and Correlation Classifier\", and the input must be \"df, target='target'\" \
+            Provide a detailed response listing these features and correlations, explaining that they were identified using the classification tool. \
+            Provide a numbered list for both the top 5 most important features and their importance scores, and the top 5 most correlated features along with their correlation scores. \
+            end the response saying someting like: Ask me whatever you want me to do on the .csv file. For example, you can ask me to drop some columns from the .csv and restart the classification to determine the top 5 most important features and correlations."
+    print("-----------------------")
+    print("Query: ", query)
+    print("-----------------------")
+    result = app.state.csv_agent.invoke(query)
     
     #await sio.emit("send_msg", result['output'])
     await sio.emit("send_resumee", msg)
@@ -230,6 +267,8 @@ class ObjectListItem(BaseModel):
 
 @app.post("/senddata", tags=["Frontend"])
 async def get_body(request: Request):
+
+    print("\n\n\nChiamato senddata\n\n\n")
     data = await request.json()
     df = pd.json_normalize(data['table'])
     dep_var = data['dep_var']

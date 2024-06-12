@@ -1,4 +1,6 @@
 import os
+import matplotlib
+matplotlib.use('Agg')
 import tensorflow as tf
 import tensorflow_addons as tfa
 from tensorflow.keras import layers
@@ -9,6 +11,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler, QuantileTransformer, MinMaxScaler
 from scipy.io.arff import loadarff 
+import scipy.stats
 from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 import seaborn as sns
@@ -103,29 +106,25 @@ def convert_columns_to_float(data):
             data[column] = data[column].astype(float)
     return data
 
-def correlation_attention(weights,classes,columns):
-    import  scipy.stats
-    #xy = pd.DataFrame({pd.Series(X),pd.Series(Y)},columns=columns)
-    #corr_matrix = np.corrcoef(stacked,rowvar=False)
+def correlation_attention(weights, classes, columns):
     correlations = []
     for i in range(len(classes)):
         k = classes[i]
-        corr_matrix, p_matrix =  scipy.stats.spearmanr(weights[i],axis=0)
+        corr_matrix, p_matrix = scipy.stats.spearmanr(weights[i], axis=0)
         correlations.append(corr_matrix)
 
-    correlations = np.asarray(correlations,dtype=np.float32)
-    mean_corr = np.mean(np.abs(correlations),axis=0)
+    correlations = np.asarray(correlations, dtype=np.float32)
+    mean_corr = np.mean(np.abs(correlations), axis=0)
     corr_matrix = mean_corr
 
     mask = np.zeros_like(corr_matrix, dtype=bool)
     mask[np.triu_indices_from(corr_matrix)] = True
     fig, ax = plt.subplots(figsize=(22, 10))
-    ax = sns.heatmap(corr_matrix, mask=mask, annot=False, linewidths=0.1, fmt=".1f", cmap="viridis",xticklabels=columns,yticklabels=columns)
+    ax = sns.heatmap(corr_matrix, mask=mask, annot=False, linewidths=0.1, fmt=".1f", cmap="viridis", xticklabels=columns, yticklabels=columns)
     bottom, top = ax.get_ylim()
     ax.set_ylim(bottom + 0.5, top - 0.5)
     ax.set_title("Correlation Matrix of Excited Attention")
     plt.savefig(f'{DIRECTORY}/correlation.png')
-    #plt.show()
     plt.close()
     return mean_corr
 
@@ -149,8 +148,7 @@ def instancewise_weight(X,y,model,layer_name='ex_1'):
     #activation = activation[0, 0, :]
     return activation#  returns instance*features matrix
 
-def plot_excited_attention_online(X,y,model,feature_names):
-
+def plot_excited_attention_online(X, y, model, feature_names):
     layers_weights = {}
     layers_names = []
     col = feature_names
@@ -160,13 +158,10 @@ def plot_excited_attention_online(X,y,model,feature_names):
 
     for layer in model.layers:
         if 'ex_' in layer.name:
-
             excitations += 1
             layers_names.append(layer.name)
-            #print('trainable weights',clf.get_layer(layer.name).trainable_weights[0])
 
             attention = instancewise_weight(X, y, model, layer_name=layer.name)
-            
             class_instances = {}
             for t in range(attention.shape[0]):
                 if y[t] not in class_instances:
@@ -174,31 +169,28 @@ def plot_excited_attention_online(X,y,model,feature_names):
                 class_instances[y[t]].append(attention[t])
 
             keys = []
-            layers_weights[layer.name] =  {}
+            layers_weights[layer.name] = {}
             for key in class_instances:
                 keys.append(key)
-                cw2 = np.sum(np.asarray(class_instances[key],dtype=np.float32),axis=0)
+                cw2 = np.sum(np.asarray(class_instances[key], dtype=np.float32), axis=0)
                 cw2 = np.asarray(cw2).reshape(-1,)
-
                 layers_weights[layer.name][key] = cw2
 
-
-    fig, axs = plt.subplots(excitations,sharex=True,sharey=True)
+    fig, axs = plt.subplots(excitations, sharex=True, sharey=True)
     current = 0
     for layer_name in layers_weights:
         weights = []
-        keys= []
+        keys = []
         for classe in layers_weights[layer_name]:
             keys.append(classe)
             weights.append(layers_weights[layer_name][classe])
-        axs[current].set_title('Excited Attention for '+str(layer_name))
-        sns.heatmap(weights, cmap="viridis",xticklabels=col, yticklabels=keys,ax=axs[current])
-        #axs[current].imshow(weights)
+        axs[current].set_title('Excited Attention for ' + str(layer_name))
+        sns.heatmap(weights, cmap="viridis", xticklabels=col, yticklabels=keys, ax=axs[current])
         current += 1
-    #plt.show()
+    plt.savefig(f'{DIRECTORY}/excited_attention.png')
     plt.close()
 
-    normalized_att = instancewise_weight(X,y,model,layer_name='hadamard')
+    normalized_att = instancewise_weight(X, y, model, layer_name='hadamard')
     class_instances = {}
     class_instances[0] = []
     for t in range(normalized_att.shape[0]):
@@ -211,17 +203,16 @@ def plot_excited_attention_online(X,y,model,feature_names):
     unhaltered_weights = []
     for key in class_instances:
         keys.append(key)
-        cw2 = np.mean(np.abs(np.asarray(class_instances[key],dtype=np.float32)),axis=0)
+        cw2 = np.mean(np.abs(np.asarray(class_instances[key], dtype=np.float32)), axis=0)
         cw2 = np.asarray(cw2).reshape(-1,)
         weights.append(cw2)
-        unhaltered_weights.append(np.asarray(class_instances[key],dtype=np.float32))
+        unhaltered_weights.append(np.asarray(class_instances[key], dtype=np.float32))
 
-    sns.heatmap(weights, cmap="viridis",xticklabels=col, yticklabels=keys).set(title='Per Class Importances')
-    plt.savefig(f'{DIRECTORY}/per_class_importances.png') #PLOT FIGURE 3
-    #plt.show()
+    sns.heatmap(weights, cmap="viridis", xticklabels=col, yticklabels=keys).set(title='Per Class Importances')
+    plt.savefig(f'{DIRECTORY}/per_class_importances.png')
     plt.close()
 
-    mean_corr = correlation_attention(unhaltered_weights,keys,col)
+    mean_corr = correlation_attention(unhaltered_weights, keys, col)
     return mean_corr
 
 def get_sorted_correlations(mean_corr, feature_names):
