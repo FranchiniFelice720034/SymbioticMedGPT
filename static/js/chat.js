@@ -1,8 +1,27 @@
 const zoom = mediumZoom({ margin: 48, background: "#2626276f" });
 var img_count = 0;
+var typing = false;
 const socket = io("http://localhost:8000/");
 socket.on('send_msg',(data)=>{
     console.log(data);
+} );
+socket.on('send_resumee',(data)=>{
+    sendGPT(data)
+    attachGPTImage('correlation_resumee.png')
+    attachGPTImage('per_class_importances_resumee.png')
+
+});
+socket.on('model_answer',(data)=>{
+    sendGPT(data[0])
+    if(data[0] == "Mhh, let me think..."){
+        toggleTypingAnimation();
+    }else if(typing){
+        toggleTypingAnimation();
+    }
+    if(data[1]){
+        attachGPTImage('correlation_resumee.png')
+        attachGPTImage('per_class_importances_resumee.png')
+    }
 } );
 //socket.emit('msg', 'a');
  //SweetAlert2 Firing modal
@@ -25,8 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function attachGPTImage(img_name){
-        //onclick="this.requestFullscreen()"
-        path = 'static/images/model_images/'+img_name;
+        path = 'static/images/chat_images/'+img_name;
         $('#chat-box').append('<div class="row">\
                                     <div class="gpt_image_container">\
                                         <img id="gpt_img_'+img_count+'"class="gtp_image" src='+path+'/>\
@@ -45,10 +63,31 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </div>'); 
         scrollToBottom();
     }
+
+    function toggleTypingAnimation(){
+        console.log(typing);
+        //su false si attiva
+        if(!typing){
+            $('#chat-box').append('<div id="gpt_typing" class="row">\
+                                        <div class="gpt_message_container" style="height: auto; background-color: #ffffff00; margin-left: 4%;">\
+                                            <div class="snippet" data-title="dot-typing">\
+                                                <div class="stage">\
+                                                <div class="dot-typing"></div>\
+                                                </div>\
+                                            </div>\
+                                        </div>\
+                                    </div>');
+                typing = true;
+        }else{
+            $('#gpt_typing').remove();
+            typing = false;
+        }
+    }
     
     function sendUserMessage(){
         var message = document.getElementById("message").value;
         if(message){
+            socket.emit('question_model', message);
             $('#chat-box').append('<div class="row">\
                                         <div class="user_message_container">\
                                             <p class="user_message">User:<br>'+message+'</p>\
@@ -56,17 +95,14 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </div>'); 
             document.getElementById("message").value = '';
             scrollToBottom();
-            sendGPT('Ok, fammi pensare.');
         }
     }
-
     // Ensure functions are globally accessible
     window.sendGPT = sendGPT;
     window.sendUserMessage = sendUserMessage;
     window.attachGPTImage = attachGPTImage;
-
-    sendGPT('Benvenuto! A breve ti fornirò una descrizione dettagliata del file che mi hai inviato!');
-
+    window.toggleTypingAnimation = toggleTypingAnimation;
+    socket.emit('request_resumee', '');
 
 });
 
