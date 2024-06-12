@@ -149,21 +149,7 @@ def _execute_model(request: Request, query: str):
 
 
 async def _start_model_get_first_review(df, dep_var):
-    msg = 'The top 5 most important features for classification are:\
-    1. age (Importance Score: 0.5646992)\
-    2. sex (Importance Score: 0.4274814)\
-    3. restecg (Importance Score: 0.3393734)\
-    4. fbs (Importance Score: 0.13357216)\
-    5. trestbps (Importance Score: 0.11224261)\
-    The top 5 most correlated features are:\
-    1. age, cp (Correlation Score: 0.56581354)\
-    2. sex, thal (Correlation Score: 0.55085963)\
-    3. thalach, oldpeak (Correlation Score: 0.48816043)\
-    4. age, oldpeak (Correlation Score: 0.48603684)\
-    5. age, slope (Correlation Score: 0.48169476)]\
-    Ask me whatever you want me to do on the .csv file. For example, you can ask me to drop some columns from the .csv and restart the classification to determine the top 5 most important features and correlations.'
-
-    """ app.state.df = df
+    app.state.df = df
     app.state.dep_var = dep_var
 
     app.state.csv_agent = create_pandas_dataframe_agent(
@@ -212,12 +198,12 @@ app.mount("/static", StaticFiles(directory="static"), name='static')
 
 # WEB INTERFACE ----------------------------------------------------------------------------------------
 
-""" @app.get("/home")
+@app.get("/home")
 def home(request: Request):
     left = 'Fernando'
     right = 'Nicotera'
     return templates.TemplateResponse(request, name="home.html", context={'id1': left, 'id2':right})
- """
+
 
 @app.get("/", tags=["Frontend"])
 def index(request: Request):
@@ -254,13 +240,13 @@ def test(request: Request):
 
 
 
-""" @app.post("/senddata")
+@app.post("/senddata")
 async def senddata(request: Request):
     body = request.stream()
     res = [i async for i in body]
     df = pd.json_normalize(body)
     df.to_csv('test.csv', index=False, encoding='utf-8')
- """
+
 
 class ObjectListItem(BaseModel):
     item: str
@@ -330,14 +316,14 @@ async def client_side_receive_msg(sid, msg):
 async def client_side_receive_msg(sid, msg):
     prompt1 = 'Now you have to drop columns from the .csv file, please drop the columns "sex" and "age"'
     prompt2 = 'Ok now restart the classification'
-    answare = ''
+    answer = ''
 
     if msg == prompt1:
-        answare = 'The .csv file now has the columns "cp", "trestbps", "chol", "fbs", "restecg", "thalach", "exang", "oldpeak", "slope", "ca", "thal", and "target" remaining in it.'
-        await sio.emit("model_answer", [answare, False])
+        answer = 'The .csv file now has the columns "cp", "trestbps", "chol", "fbs", "restecg", "thalach", "exang", "oldpeak", "slope", "ca", "thal", and "target" remaining in it.'
+        await sio.emit("model_answer", [answer, False])
 
     elif msg == prompt2:
-        answare = 'The top 5 most important features for classification are:\
+        answer = 'The top 5 most important features for classification are:\
                             1. slope (Importance Score: 0.34682822)\
                             2. oldpeak (Importance Score: 0.3028454)\
                             3. fbs (Importance Score: 0.09012242)\
@@ -349,8 +335,8 @@ async def client_side_receive_msg(sid, msg):
                             3. slope, thalach (Correlation Score: 0.49823856)\
                             4. slope, exang (Correlation Score: 0.48489332)\
                             5. thalach, oldpeak (Correlation Score: 0.47241843)'
-        await sio.emit("model_answer", [answare, True])
+        await sio.emit("model_answer", [answer, True])
 
     else:
-        answare = 'Mhh, let me think...'
-        await sio.emit("model_answer", [answare, False])
+        answer = 'Mhh, let me think...'
+        await sio.emit("model_answer", [answer, False])

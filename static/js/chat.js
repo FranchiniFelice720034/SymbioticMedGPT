@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function sendGPT(message){
         $('#chat-box').append('<div class="row">\
                                     <div class="gpt_message_container">\
-                                        <p class="gpt_message">MedGPT:<br>'+message+'</p>\
+                                        <p class="gpt_message"><b>MedGPT</b>:<br>'+message+'</p>\
                                     </div>\
                                 </div>'); 
         scrollToBottom();
