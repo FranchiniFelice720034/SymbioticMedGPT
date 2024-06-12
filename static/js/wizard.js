@@ -236,23 +236,6 @@ function showProgress(){
         return dep_var;
     }
 
-    function sendData(){
-        csv_data = grid.getData();
-        var dep_var = getDepVars();
-        $.ajax({ 
-            type: "POST",
-            url: url+'senddata',
-            data: JSON.stringify({"table": csv_data, "dep_var": dep_var}),
-            success: function(data){        
-                console.log(data);
-            },
-            error: function(err){
-                console.log(err);
-            }
-            
-            
-        });
-    }
 
     function redo(){
         grid.redo();

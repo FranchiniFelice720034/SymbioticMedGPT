@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
             socket.emit('question_model', message);
             $('#chat-box').append('<div class="row">\
                                         <div class="user_message_container">\
-                                            <p class="user_message">User:<br>'+message+'</p>\
+                                            <p class="user_message"><b>You</b>:<br>'+message+'</p>\
                                         </div>\
                                     </div>'); 
             document.getElementById("message").value = '';
