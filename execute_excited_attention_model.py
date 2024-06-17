@@ -24,7 +24,7 @@ random.seed(42)
 np.random.seed(42)
 tf.random.set_seed(42)
 
-DIRECTORY = 'chat_images'
+DIRECTORY = 'static/images/chat_images'
 
 class Excitation(layers.Layer):
     def __init__(self, ratio=1, activation='elu', layer_name='ex', **kwargs):
@@ -124,7 +124,7 @@ def correlation_attention(weights, classes, columns):
     bottom, top = ax.get_ylim()
     ax.set_ylim(bottom + 0.5, top - 0.5)
     ax.set_title("Correlation Matrix of Excited Attention")
-    plt.savefig(f'{DIRECTORY}/correlation.png')
+    plt.savefig(f'{DIRECTORY}/correlation_resumee.png')
     plt.close()
     return mean_corr
 
@@ -209,7 +209,7 @@ def plot_excited_attention_online(X, y, model, feature_names):
         unhaltered_weights.append(np.asarray(class_instances[key], dtype=np.float32))
 
     sns.heatmap(weights, cmap="viridis", xticklabels=col, yticklabels=keys).set(title='Per Class Importances')
-    plt.savefig(f'{DIRECTORY}/per_class_importances.png')
+    plt.savefig(f'{DIRECTORY}/per_class_importances_resumee.png')
     plt.close()
 
     mean_corr = correlation_attention(unhaltered_weights, keys, col)
@@ -274,7 +274,7 @@ def get_important_features_and_correlated_features(dataframe, dep_var):
         run_eagerly=False
     )
     model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-                        filepath='best_model.keras',
+                        filepath=f'{DIRECTORY}/best_model.keras',
                         save_weights_only=False,
                         monitor='val_f1_score',#accuracy
                         mode='max',
@@ -285,7 +285,7 @@ def get_important_features_and_correlated_features(dataframe, dep_var):
         shuffle=True, validation_data=(X_test, y_test), 
         callbacks=[tf.keras.callbacks.EarlyStopping(patience=patience, monitor='val_f1_score', mode='max'),model_checkpoint_callback]
     )
-    model.load_weights('best_model.keras')
+    model.load_weights(f'{DIRECTORY}/best_model.keras')
 
     # Create a new model that extracts the output of the Excitation layer
     excitation_output_model = Model(inputs=model.input,

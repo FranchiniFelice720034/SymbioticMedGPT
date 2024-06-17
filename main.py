@@ -125,6 +125,7 @@ app.add_middleware(
 
 async def _execute_model(query: str):
     def sync_execute_model(query):
+        has_images = False
         print("Chiamato execute")
         if not hasattr(app.state, 'csv_agent'):
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Model not loaded")
@@ -134,20 +135,22 @@ async def _execute_model(query: str):
             query = (
                 query[:idx + len("classification")] +
                 ". \
-                Use the Feature Importance and Correlation Classifier tool to identify the top 5 most important features and the top 5 most correlated features. \
-                Use as action \"Feature Importance and Correlation Classifier\", and as input \"df, target='target'\"" +
+                Use Feature Importance and Correlation Classifier tool to identify the top 5 most important features and the top 5 most correlated features. \
+                Use action: \"Feature Importance and Correlation Classifier\", use input: \"df, target='target'\"" +
                 query[idx + len("classification"):]
             )
 
             query += " Provide a detailed response listing these features and correlations, explaining that they were identified using the classification tool. " \
                      "Provide a numbered list for both the top 5 most important features and their importance scores, and the top 5 most correlated features along with their correlation scores. " \
                      "End the response saying: Ask me whatever you want me to do on the .csv file. For example, you can ask me to drop some columns from the .csv and restart the classification to determine the top 5 most important features and correlations."
+            
+            has_images = True
 
         print("-----------------------")
         print("Query: ", query)
         print("-----------------------")
         result = app.state.csv_agent.invoke(query)
-        return result['output']
+        return [result['output'], has_images]
 
     result = await run_in_threadpool(sync_execute_model, query)
     return result
@@ -167,7 +170,6 @@ async def _start_model_get_first_review():
         )
         query = f"Perform a classification on the dataframe with the dependent variable '{app.state.dep_var}'. \
                 Use the Feature Importance and Correlation Classifier tool to identify the top 5 most important features and the top 5 most correlated features. \
-                Your action must be \"Feature Importance and Correlation Classifier\", and the input must be \"df, target='target'\" \
                 Provide a detailed response listing these features and correlations, explaining that they were identified using the classification tool. \
                 Provide a numbered list for both the top 5 most important features and their importance scores, and the top 5 most correlated features along with their correlation scores. \
                 end the response saying someting like: Ask me whatever you want me to do on the .csv file. For example, you can ask me to drop some columns from the .csv and restart the classification to determine the top 5 most important features and correlations."
@@ -325,7 +327,7 @@ async def client_side_receive_msg(sid, msg):
         await sio.emit("model_answer", [answer, False])'''
     
     output = await _execute_model(msg)
-    await sio.emit("model_answer", [output, False])
+    await sio.emit("model_answer", output)
 
     #Domanda1: Now you have to drop columns from the .csv file, please drop the columns "sex" and "age"
     #Domanda2: Ok now restart the classification
