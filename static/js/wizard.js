@@ -361,8 +361,25 @@ function showProgress(){
         buttonsStyling: false
       });
 
+
+    function sendData(){
+        csv_data = grid.getData();
+        var dep_var = getDepVars();
+        $.ajax({ 
+            type: "POST",
+            url: url+'senddata',
+            data: JSON.stringify({"table": csv_data, "dep_var": dep_var}),
+            success: function(data){        
+                console.log(data);
+            },
+            error: function(err){
+                console.log(err);
+            }
+        });
+    }  
       
     function fireConfirmModal(){
+        sendData();
         swalWithBootstrapButtons.fire({
             title: "Are you sure to start analysis?",
           /*   text: "You won't be able to revert this!", */

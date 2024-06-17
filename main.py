@@ -123,7 +123,7 @@ app.add_middleware(
 
 @app.get("/execute", tags=["Use Model"])
 def _execute_model(request: Request, query: str):
-    """ print("Chiamato execute")
+    print("Chiamato execute")
     if not hasattr(request.app.state, 'csv_agent'):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Model not loaded")
 
@@ -145,15 +145,13 @@ def _execute_model(request: Request, query: str):
     print("Query: ", query)
     print("-----------------------")
     result = request.app.state.csv_agent.invoke(query)
-    return result['output'] """
+    return result['output']
 
 
-async def _start_model_get_first_review(df, dep_var):
-    app.state.df = df
-    app.state.dep_var = dep_var
+def _start_model_get_first_review():
 
     app.state.csv_agent = create_pandas_dataframe_agent(
-        app.state.llm, df, include_df_in_prompt = True, 
+        app.state.llm, app.state.df, include_df_in_prompt = True, 
         prefix=PREFIX, verbose=True,
         extra_tools=[custom_classification_tool, custom_drop_columns_tool],
         agent_executor_kwargs={
@@ -162,7 +160,7 @@ async def _start_model_get_first_review(df, dep_var):
             "memory": chat_history_buffer
         }
     )
-    query = f"Perform a classification on the dataframe with the dependent variable '{dep_var}'. \
+    query = f"Perform a classification on the dataframe with the dependent variable '{app.state.dep_var}'. \
             Use the Feature Importance and Correlation Classifier tool to identify the top 5 most important features and the top 5 most correlated features. \
             Your action must be \"Feature Importance and Correlation Classifier\", and the input must be \"df, target='target'\" \
             Provide a detailed response listing these features and correlations, explaining that they were identified using the classification tool. \
@@ -173,8 +171,8 @@ async def _start_model_get_first_review(df, dep_var):
     print("-----------------------")
     result = app.state.csv_agent.invoke(query)
     
+    return result['output']
     #await sio.emit("send_msg", result['output'])
-    await sio.emit("send_resumee", msg)
 
 
 @app.post("/debug-custom_classification_tool", tags=["Debug"])
@@ -240,14 +238,6 @@ def test(request: Request):
 
 
 
-@app.post("/senddata")
-async def senddata(request: Request):
-    body = request.stream()
-    res = [i async for i in body]
-    df = pd.json_normalize(body)
-    df.to_csv('test.csv', index=False, encoding='utf-8')
-
-
 class ObjectListItem(BaseModel):
     item: str
 
@@ -276,13 +266,16 @@ async def get_body(request: Request):
     
     print(dep_var)
     df.to_csv('csv/uploaded/csv_'+str(ts)+'.csv', index=False, encoding='utf-8')
-    await _start_model_get_first_review(df, dep_var)
+
+    app.state.df = df
+    app.state.dep_var = dep_var
 
 #Socket
 sio=socketio.AsyncServer(cors_allowed_origins='*',async_mode='asgi')
 #wrap with ASGI application
 socket_app = socketio.ASGIApp(sio)
 app.mount("/", socket_app)
+
 @sio.on("connect")
 async def connect(sid, env):
     print("New Client Connected to This id :"+" "+str(sid))
@@ -309,7 +302,12 @@ async def client_side_receive_msg(sid, msg):
     you can ask me to drop some columns from the .csv and restart the classification\
     to determine the top 5 most important features and correlations.'
 
-    await sio.emit("send_resumee", resumee)
+    #await sio.emit("send_resumee", resumee)
+    output = _start_model_get_first_review()
+    await sio.emit("send_msg", "I'm thinking...")
+    time.sleep(20)
+    print(output)
+    await sio.emit("send_resumee", output)
 
 
 @sio.on('question_model')
