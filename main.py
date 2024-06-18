@@ -100,7 +100,7 @@ async def lifespan(app: FastAPI):
     app.state.llm = LlamaCpp(
         model_path=model_path,
         n_gpu_layers=-1, 
-        temperature=0.1,
+        temperature=0.01,
         max_tokens=4096, 
         n_ctx=4096,
         top_p=1,
@@ -169,7 +169,7 @@ async def _start_model_get_first_review():
             }
         )
         query = f"Perform a classification on the dataframe with the dependent variable '{app.state.dep_var}'. \
-                Use the Feature Importance and Correlation Classifier tool to identify the top 5 most important features and the top 5 most correlated features. \
+                Use action: Feature Importance and Correlation Classifier \
                 Provide a detailed response listing these features and correlations, explaining that they were identified using the classification tool. \
                 Provide a numbered list for both the top 5 most important features and their importance scores, and the top 5 most correlated features along with their correlation scores. \
                 end the response saying someting like: Ask me whatever you want me to do on the .csv file. For example, you can ask me to drop some columns from the .csv and restart the classification to determine the top 5 most important features and correlations."

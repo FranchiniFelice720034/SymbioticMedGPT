@@ -44,10 +44,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function attachGPTImage(img_name){
-        path = 'static/images/chat_images/'+img_name;
+        var timestamp = new Date().getTime();
+        var path = 'static/images/chat_images/' + img_name + '?t=' + timestamp;
         $('#chat-box').append('<div class="row">\
                                     <div class="gpt_image_container">\
-                                        <img id="gpt_img_'+img_count+'"class="gtp_image" src='+path+'/>\
+                                        <img id="gpt_img_'+img_count+timestamp+'" class="gtp_image" src='+path+'/>\
                                     </div>\
                                 </div>'); 
         scrollToBottom();
