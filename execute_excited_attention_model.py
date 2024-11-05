@@ -107,15 +107,19 @@ def convert_columns_to_float(data):
     return data
 
 def correlation_attention(weights, classes, columns):
+    print("Correlation matrix")
     correlations = []
     for i in range(len(classes)):
         k = classes[i]
         corr_matrix, p_matrix = scipy.stats.spearmanr(weights[i], axis=0)
         correlations.append(corr_matrix)
-
+    print("Correlation matrix computed", correlations)
     correlations = np.asarray(correlations, dtype=np.float32)
+    print("1")
     mean_corr = np.mean(np.abs(correlations), axis=0)
+    print("2")
     corr_matrix = mean_corr
+    print("Correlation matrix computed")
 
     mask = np.zeros_like(corr_matrix, dtype=bool)
     mask[np.triu_indices_from(corr_matrix)] = True
@@ -125,7 +129,9 @@ def correlation_attention(weights, classes, columns):
     ax.set_ylim(bottom + 0.5, top - 0.5)
     ax.set_title("Correlation Matrix of Excited Attention")
     plt.savefig(f'{DIRECTORY}/correlation_resumee.png')
+    print("Correlation matrix saved")
     plt.close()
+    print("Correlation matrix closed")
     return mean_corr
 
 
@@ -256,12 +262,10 @@ def get_important_features_and_correlated_features(dataframe, dep_var):
         y = np.array([label_mapping[label] for label in y])
     y = to_categorical(y)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     scaler = MinMaxScaler()
-    X_train = scaler.fit_transform(X_train)
-    X_test = scaler.transform(X_test)
+    X = scaler.fit_transform(X)
 
-    num_classes = len(y_train[0])
+    num_classes = len(y[0])
     num_features = len(feature_names)
     
     model = get_tabular_model(num_features, num_classes)
@@ -276,14 +280,14 @@ def get_important_features_and_correlated_features(dataframe, dep_var):
     model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
                         filepath=f'{DIRECTORY}/best_model.keras',
                         save_weights_only=False,
-                        monitor='val_f1_score',#accuracy
+                        monitor='accuracy',#accuracy
                         mode='max',
                         save_best_only=True)
     model.fit(
-        X_train, y_train, 
+        X, y, 
         epochs=n_epochs, batch_size=batch_size, 
-        shuffle=True, validation_data=(X_test, y_test), 
-        callbacks=[tf.keras.callbacks.EarlyStopping(patience=patience, monitor='val_f1_score', mode='max'),model_checkpoint_callback]
+        shuffle=True, 
+        callbacks=[tf.keras.callbacks.EarlyStopping(patience=patience, monitor='accuracy', mode='max'),model_checkpoint_callback]
     )
     model.load_weights(f'{DIRECTORY}/best_model.keras')
 
@@ -292,7 +296,7 @@ def get_important_features_and_correlated_features(dataframe, dep_var):
                                     outputs=model.get_layer('hadamard').output)
 
     # Get the output of the Excitation layer for the test data
-    excitation_outputs = excitation_output_model.predict(X_test)
+    excitation_outputs = excitation_output_model.predict(X)
 
     # Reshape the output to remove the batch dimension
     output_array = np.squeeze(excitation_outputs, axis=1)
@@ -309,8 +313,10 @@ def get_important_features_and_correlated_features(dataframe, dep_var):
         feature_score = top_50_scores[i]
         top_5_features.append((feature_name, feature_score))
 
-    y_test_argmax = [np.argmax(y) for y in y_test]
-    mean_corr = plot_excited_attention_online(X_test, y_test_argmax, model, feature_names)
+    y_test_argmax = [np.argmax(y) for y in y]
+    print("PLOTTING EXCITED ATTENTION")
+    mean_corr = plot_excited_attention_online(X, y_test_argmax, model, feature_names)
+    print("GETTING SORTED CORRELATIONS")
     sorted_correlations = get_sorted_correlations(mean_corr, feature_names)
     result = {
         'top_5_features': top_5_features,

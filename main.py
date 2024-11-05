@@ -3,7 +3,6 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, File, UploadFile, Request, Form, HTTPException, status
 from fastapi.responses import JSONResponse
 from langchain_community.llms import LlamaCpp
-from langchain_openai import OpenAI
 from langchain.memory import ConversationBufferWindowMemory
 from langchain_core.callbacks import CallbackManager, StreamingStdOutCallbackHandler
 from langchain_experimental.agents import create_pandas_dataframe_agent
@@ -56,12 +55,13 @@ chat_history_buffer = ConversationBufferWindowMemory(
 def perform_classification_fn(*args, **kwargs) -> dict[str, list[tuple]]:
     # Perform the classification
     result = get_important_features_and_correlated_features(app.state.df, app.state.dep_var)
+    print("EXITED FUNCTION")
     return result
 custom_classification_tool = Tool.from_function(
     func=perform_classification_fn,
     #return_direct=True,
     name="Feature Importance and Correlation Classifier",
-    description="Use this tool to identify the top 5 most important features for classification given a dependent variable, \
+    description="Use this tool only when asked to identify the top 5 most important features for classification given a dependent variable, \
         along with their importance scores, and the top 5 feature correlations. \
         The tool will return a dictionary with two keys: 'top_5_features' and 'top_5_correlations'. \
         'top_5_features' will be a list of tuples, where each tuple contains a feature name and its importance score. \
@@ -90,7 +90,7 @@ def drop_columns_fn(*args, **kwargs) -> list[str]:
 custom_drop_columns_tool = Tool.from_function(
     func=drop_columns_fn,
     name="Column Dropper",
-    description="Use this tool to drop specified columns from a pandas dataframe. Provide a list of the column names to drop, \
+    description="Use this tool only when asked to drop specified columns from a pandas dataframe. Provide a list of the column names to drop, \
         and the tool will return the names of the remaining columns in the dataframe."
 )
 
@@ -101,7 +101,7 @@ async def lifespan(app: FastAPI):
         model_path=model_path,
         n_gpu_layers=-1, 
         temperature=0.01,
-        max_tokens=4096, 
+        max_tokens=4096,
         n_ctx=4096,
         top_p=1,
         callback_manager=callback_manager,
@@ -179,6 +179,7 @@ async def _start_model_get_first_review():
         result = app.state.csv_agent.invoke(query)
         return result['output']
 
+    print("Chiamato start model")
     result = await run_in_threadpool(sync_start_model_get_first_review)
     return result
 
@@ -299,33 +300,6 @@ async def client_side_receive_msg(sid, msg):
 
 @sio.on('question_model')
 async def client_side_receive_msg(sid, msg):
-    '''prompt1 = 'Now you have to drop columns from the .csv file, please drop the columns "sex" and "age"'
-    prompt2 = 'Ok now restart the classification'
-    answer = ''
-
-    if msg == prompt1:
-        answer = 'The .csv file now has the columns "cp", "trestbps", "chol", "fbs", "restecg", "thalach", "exang", "oldpeak", "slope", "ca", "thal", and "target" remaining in it.'
-        await sio.emit("model_answer", [answer, False])
-
-    elif msg == prompt2:
-        answer = 'The top 5 most important features for classification are:\
-                            1. slope (Importance Score: 0.34682822)\
-                            2. oldpeak (Importance Score: 0.3028454)\
-                            3. fbs (Importance Score: 0.09012242)\
-                            4. thal (Importance Score: 0.080464534)\
-                            5. chol (Importance Score: -0.078735836)\
-                            The top 5 most correlated features are:\
-                            1. oldpeak, slope (Correlation Score: 0.5361485)\
-                            2. trestbps, thalach (Correlation Score: 0.5220156)\
-                            3. slope, thalach (Correlation Score: 0.49823856)\
-                            4. slope, exang (Correlation Score: 0.48489332)\
-                            5. thalach, oldpeak (Correlation Score: 0.47241843)'
-        await sio.emit("model_answer", [answer, True])
-
-    else:
-        answer = 'Mhh, let me think...'
-        await sio.emit("model_answer", [answer, False])'''
-    
     output = await _execute_model(msg)
     await sio.emit("model_answer", output)
 
