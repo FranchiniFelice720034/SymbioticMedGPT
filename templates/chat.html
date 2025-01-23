@@ -19,11 +19,6 @@
                     <i class="fa-solid fa-house" style="color: black"></i>
                 </a>
             </div>
-            <div class="col d-flex justify-content-end p-3">
-                <a onclick="toggleTheme()" id="themeToggleBtn" class="circle-anchor" style="background-color: #88b2ccda; cursor: pointer;">
-                    <i id="themeIcon" class="fas fa-sun" style="color: white;"></i>
-                </a>
-            </div>
             
         </div>
         
@@ -31,17 +26,25 @@
 
     <div id="chat-box" style="height: 70%; overflow-y: auto; padding: 10px;"></div>
 
-    <div class="container d-flex align-items-center mt-5 user_tools">
-        
-        <input id="message" type="text" class="form-control form-rounded" style="border-radius: 2rem; display: inline-block; width: 85%;" placeholder="Type a message">
-        
-        <a type="submit" onclick="sendUserMessage()" class="circle-anchor" style="margin-left: 1%; cursor: pointer; ">
+    <div class="container d-flex align-items-center justify-content-center mt-5" style="padding-left: 80px;">
+        <input id="message" type="text" class="form-control form-rounded" 
+               style="border-radius: 2rem; width: 85%;" placeholder="Type a message">
+        <a type="submit" onclick="sendUserMessage()" class="circle-anchor ms-3" 
+           style="cursor: pointer;">
             <img src="static/images/icons/sent_icon.svg" style="width: 30px; height: 30px"/>
         </a>
-        <!-- <a onclick="attachGPTImage('image.png')" class="circle-anchor" style="margin-left: 1%; cursor: pointer; background-color: blue">
-            <img src="static/images/icons/sent_icon.svg" style="width: 30px; height: 30px"/>
-        </a> -->
     </div>
+    
+    <script>
+        // Add an event listener to the input field
+        document.getElementById("message").addEventListener("keydown", function(event) {
+            // Check if the pressed key is "Enter"
+            if (event.key === "Enter") {
+                event.preventDefault(); // Prevent the default behavior (like form submission)
+                sendUserMessage(); // Call the sendUserMessage function
+            }
+        });
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>

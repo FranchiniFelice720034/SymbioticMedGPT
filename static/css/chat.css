@@ -45,7 +45,7 @@ body{
     float: right;
     border-radius: 2rem;
     margin-left: 65%;
-    margin-bottom: 4%;
+    margin-bottom: 0.5%;
     margin-right: 2%;
     display: inline-block;
     background-color: var(--user-chat-bgcolor);
@@ -57,7 +57,7 @@ body{
     float: left;
     border-radius: 2rem;
     margin-left: 2%;
-    margin-bottom: 4%;
+    margin-bottom: 0.5%;
     margin-right: 65%;
     display: inline-block;
     background-color: var(--gbt-chat-bgcolor);
@@ -78,7 +78,7 @@ body{
     background-color: var(--gbt-chat-bgcolor);
     border-radius: 2rem;
     margin-left: 2%;
-    margin-bottom: 4%;
+    margin-bottom: 0.5%;
     margin-right: 65%;
     display: inline-block;
     max-width: 40%;
