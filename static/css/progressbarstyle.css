@@ -1,0 +1,190 @@
+* { 
+    margin: 0; 
+    padding: 0
+} 
+  
+html { 
+    height: 100%
+} 
+  
+h2{ 
+    color: #282120; 
+} 
+#form { 
+    text-align: center; 
+    position: relative; 
+    margin-top: 20px
+} 
+  
+#form fieldset { 
+    background: white; 
+    border: 0 none; 
+    border-radius: 0.5rem; 
+    box-sizing: border-box; 
+    width: 100%; 
+    margin: 0; 
+    padding-bottom: 20px; 
+    position: relative
+} 
+  
+.finish { 
+    text-align: center
+} 
+  
+#form fieldset:not(:first-of-type) { 
+    display: none
+} 
+  
+.next-step { 
+    width: 100px; 
+    font-weight: bold; 
+    color: white; 
+    border: 0 none; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    padding: 10px 5px; 
+    margin: 30px 5px 10px 0px; 
+    float: right
+}
+
+.previous-step { 
+    width: 120px; 
+    font-weight: bold; 
+    color: white; 
+    border: 0 none; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    padding: 10px 5px; 
+    margin: 30px 5px 10px 0px; 
+    float: left
+} 
+  
+.form, .previous-step { 
+    background: #FAD02C; 
+} 
+  
+.form, .next-step { 
+    background: #FAD02C; 
+} 
+  
+#form .previous-step:hover, 
+#form .previous-step:focus { 
+    background-color: #FAD02C;
+} 
+  
+#form .next-step:hover, 
+#form .next-step:focus { 
+    background-color: #FAD02C;
+} 
+  
+.text { 
+    color: #FAD02C; 
+    font-weight: normal;
+} 
+  
+#progressbar { 
+    margin-bottom: 30px; 
+    overflow: hidden; 
+    color: lightgrey 
+} 
+  
+#progressbar .active { 
+    color: #FAD02C
+} 
+  
+#progressbar li { 
+    list-style-type: none; 
+    font-size: 15px; 
+    width: 25%; 
+    float: left; 
+    position: relative; 
+    font-weight: 400
+} 
+  
+#progressbar #step1:before { 
+    content: "1"
+} 
+  
+#progressbar #step2:before { 
+    content: "2"
+} 
+  
+#progressbar #step3:before { 
+    content: "3"
+} 
+  
+#progressbar #step4:before { 
+    content: "4"
+} 
+  
+#progressbar li:before { 
+    width: 50px; 
+    height: 50px; 
+    line-height: 45px; 
+    display: block; 
+    font-size: 20px; 
+    color: #ffffff; 
+    background: lightgray; 
+    border-radius: 50%; 
+    margin: 0 auto 10px auto; 
+    padding: 2px
+} 
+  
+#progressbar li:after { 
+    content: ''; 
+    width: 100%; 
+    height: 2px; 
+    background: lightgray; 
+    position: absolute; 
+    left: 0; 
+    top: 25px; 
+    z-index: -1
+} 
+  
+#progressbar li.active:before, 
+#progressbar li.active:after { 
+    background: #FAD02C
+} 
+  
+.progress { 
+    height: 20px
+} 
+  
+.progress-bar { 
+    background-color: #FAD02C
+}
+/*For CB*/
+.checkboxes {
+    text-align:center;
+  }
+.checkboxes input{
+    margin: 0px 0px 0px 0px;
+  }
+.checkboxes label{
+    margin: 0px 20px 0px 3px;
+  }
+
+::-webkit-scrollbar {
+    width: 20px;
+  }
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+  /* Handle */
+::-webkit-scrollbar-thumb {
+    background: #FAD02C;
+    border-radius: 10px;
+  }
+  
+  /* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
+  body {
+    overflow-x: hidden; /* Hide horizontal scrollbar */
+  }
+  
